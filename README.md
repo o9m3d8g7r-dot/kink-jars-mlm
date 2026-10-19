@@ -1,4 +1,4 @@
-# Kink Jars
+# kinks.casa
 
 Live at [kinks.casa](https://kinks.casa). A single-page questionnaire: pick a color, rate each jar 1–5 (or tag it curious, or tape it shut as a hard limit), share a link or a short code.
 Everything runs in the browser. Nothing is uploaded, and answers are only kept in that person's browser (localStorage) so a refresh doesn't wipe them. A shared link carries the sheet after the `#`, a part of the address browsers never send to the host.

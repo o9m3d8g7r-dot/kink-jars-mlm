@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kink Jars</title>
+<title>kinks.casa</title>
 <meta name="description" content="Fill your jars, pick your color, share your link.">
-<meta property="og:title" content="Kink Jars">
+<meta property="og:title" content="kinks.casa">
 <meta property="og:description" content="Fill your jars, pick your color, share your link.">
 <meta property="og:site_name" content="kinks.casa">
 <meta name="robots" content="noindex">
 <link rel="icon" id="icon" href="data:,">
 <style>
-  /* fonts: self-hosted in fonts/ so the page makes no third-party requests */
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-cyrillic-ext.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-cyrillic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-vietnamese.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
@@ -36,7 +35,6 @@
   header h1 span{color:var(--c);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
   header p{margin:10px 0 0;color:var(--muted);max-width:640px}
   .layout{display:grid;gap:24px}
-  /* phones: the side column dissolves into the single column, so the compare panel can be moved to the top */
   .side{display:contents}
   #cmp{order:-1;margin-bottom:-4px}
   @media(min-width:960px){.layout{grid-template-columns:minmax(0,1fr) 430px}.side{display:block;position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin}#cmp{margin-bottom:20px}}
@@ -205,7 +203,7 @@
 <div class="bar"><div class="bar-in"><span id="progress">0 of 35 answered</span><button class="big" id="shareBar" type="button">Share my link</button></div></div>
 
 <script>
-/* ===== Edit the jars here. Each array is the label, one entry per line. ===== */
+/* ===== jars ===== */
 const JARS = [
   ["being","a dom"],["being","a sub"],["praising"],["being","praised"],["degrading"],["being","degraded"],["dirty","talk"],
   ["spanking"],["being","spanked"],["choking"],["being","choked"],["giving","pain"],["receiving","pain"],["rough","sex"],
@@ -213,9 +211,7 @@ const JARS = [
   ["being the","caregiver"],["being","the little"],["cnc,","taking","charge"],["cnc,","resisting"],["role","play"],["doing stuff","in public"],["threesomes","and more"],
   ["giving","anal"],["receiving","anal"],["watching"],["being","watched"],["feet"],["spit"],["water","sports"]
 ];
-/* Give/receive pairs, by position in JARS. When two people compare, each of these is set against the other person's opposite jar. */
 const PAIRS = [[0, 1], [2, 3], [4, 5], [7, 8], [9, 10], [11, 12], [14, 15], [16, 17], [21, 22], [23, 24], [28, 29], [30, 31]];
-/* One-line explainers, shown behind "What's this?". Keyed by the label text, so order doesn't matter; a jar without one gets no link. */
 const ABOUT = {
   "being a dom": "Taking the lead. You set the pace and call the shots, inside limits you both agreed.",
   "being a sub": "Handing over the lead. You follow your partner's direction, inside limits you both agreed.",
@@ -257,22 +253,21 @@ const PRESETS = ["#e63946","#ff5d8f","#ff8c42","#ffd23f","#7bd389","#2ec4b6","#3
 const COLS = 7, INK = "#151311", PW = 1200;
 const ROWS = Math.ceil(JARS.length / COLS);
 const PH = 260 + (ROWS - 1) * 345 + 360;
-const STORE = "kinkjars-v2"; // bumped with the jar set: answers are positional, so each set starts fresh
-const CURIOUS = 6, LIMIT = 7, MARKS = { [CURIOUS]: "Curious", [LIMIT]: "Hard limit" }; // answer values past the 1–5 fill levels
+const STORE = "kinkjars-v2";
+const CURIOUS = 6, LIMIT = 7, MARKS = { [CURIOUS]: "Curious", [LIMIT]: "Hard limit" };
 const MATE = JARS.map((_, i) => i); PAIRS.forEach(([a, b]) => { MATE[a] = b; MATE[b] = a; });
 const high = v => v === 4 || v === 5;
 
 /* ===== state ===== */
 let state = { color: "#e63946", answers: JARS.map(() => 0) }, firstVisit = true;
 try {
-  localStorage.removeItem("kinkjars-v1"); // answers for the earlier jar set
+  localStorage.removeItem("kinkjars-v1");
   const s = JSON.parse(localStorage.getItem(STORE) || "null");
-  // only the color and the answers are taken, so a name saved back when the page asked for one is dropped on the next save
   if (s && Array.isArray(s.answers)) { state = { color: s.color || state.color, answers: JARS.map((_, i) => s.answers[i] || 0) }; firstVisit = false; }
 } catch (e) {}
 const persist = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
-let shown = null; // the sheet { color, answers } of an opened link: it is shown read-only instead of the page, and never stored
-let other = null; // a second sheet, when the link holds two: the picture then sets it beside the first
+let shown = null;
+let other = null;
 
 /* ===== color helpers ===== */
 const hexToRgb = h => { h = h.replace("#", ""); if (h.length === 3) h = [...h].map(x => x + x).join(""); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -282,13 +277,13 @@ const css = (a, al = 1) => `rgba(${a.map(Math.round).join(",")},${al})`;
 const lighten = (a, t) => css(mix(a, [255, 255, 255], t));
 const darken = (a, t) => css(mix(a, [0, 0, 0], t));
 const lum = ([r, g, b]) => (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-function randomColor() { // any hue, kept vivid and mid-bright so the liquid reads well
+function randomColor() {
   const h = Math.random() * 360, s = 0.65 + Math.random() * 0.3, l = 0.45 + Math.random() * 0.2;
   const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
   const f = n => 255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)));
   return rgbToHex([f(0), f(8), f(4)]);
 }
-if (firstVisit) { state.color = randomColor(); persist(); } // a new visitor starts with a color of their own, and keeps it on reload
+if (firstVisit) { state.color = randomColor(); persist(); }
 
 function rng(seed) { return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
@@ -351,7 +346,6 @@ function tape(c, x1, y1, x2, y2, w) { // strip from (x1,y1) to (x2,y2) with notc
   c.closePath();
 }
 
-/* Each jar gets one of six "overflow" looks, with its own random details. */
 const STYLE_NAMES = ["drips", "puddle", "foam", "geyser", "splash", "hearts"];
 function jarParams(idx) {
   const r = rng(idx * 7919 + 101);
@@ -391,13 +385,13 @@ function jarParams(idx) {
   return P;
 }
 
-function drawJar(c, idx, level, rgb, half = 0) { // half: -1 or 1 draws only the left or right side, for two people sharing one jar
+function drawJar(c, idx, level, rgb, half = 0) {
   const P = jarParams(idx), r = P.r, fill = css(rgb);
-  const mark = level > 5 ? level : 0; if (mark) level = 0; // curious / hard limit: an empty jar plus a marker
+  const mark = level > 5 ? level : 0; if (mark) level = 0;
   c.save(); c.lineJoin = "round"; c.lineCap = "round";
   if (half) { c.beginPath(); c.rect(half < 0 ? -80 : 48, -90, 128, 300); c.clip(); }
 
-  // puddle sits under the jar (it spans the middle, so a shared jar goes without)
+  // puddle
   if (level === 5 && P.puddle && !half) {
     c.beginPath(); blob(c, P.puddle); c.lineWidth = 7; c.strokeStyle = INK; c.stroke(); c.fillStyle = fill; c.fill();
     c.beginPath(); c.ellipse(20, 172, 10, 2.5, 0, 0, 7); c.fillStyle = "rgba(255,255,255,.55)"; c.fill();
@@ -430,7 +424,6 @@ function drawJar(c, idx, level, rgb, half = 0) { // half: -1 or 1 draws only the
   if (level === 5) {
     const shapes = [];
     const foamFill = lighten(rgb, .55);
-    // a shared jar keeps only the pieces that sit wholly on this side, so nothing is cut off at the middle
     const whole = (x, w) => !half || half * (x - 48) > w + 4, side = list => (list || []).filter(([x, , w]) => whole(x, w));
     const drips = P.drips.filter(d => whole(d.cx, d.w * 0.56)), foam = side(P.foam), drops = side(P.drops), splats = side(P.splats), hearts = side(P.hearts);
     if (P.style === 3 && !half) shapes.push({ fill, path: () => {
@@ -461,7 +454,7 @@ function drawJar(c, idx, level, rgb, half = 0) { // half: -1 or 1 draws only the
   // lid
   if (level === 5 && P.lid && !half) drawLid(c, P.lid.dx, P.lid.dy, P.lid.rot); else drawLid(c);
 
-  // markers: wobble comes from P.phase, so nothing here draws from r()
+  // markers
   const wob = Math.sin(P.phase);
   if (half) { c.translate(48 + half * 22.5, 99); c.scale(.52, .52); c.translate(-48, -99); }
   if (mark === LIMIT) {
@@ -486,32 +479,31 @@ function drawJar(c, idx, level, rgb, half = 0) { // half: -1 or 1 draws only the
 }
 
 /* ===== poster ===== */
-function shelf(c, x0, x1, y) { // the wooden plank a row of jars stands on; y is its top, where the jars end
+function shelf(c, x0, x1, y) {
   c.beginPath(); roundRect(c, x0, y, x1 - x0, 17, 6); c.fillStyle = "#e3b37c"; c.fill(); c.lineWidth = 4.5; c.strokeStyle = INK; c.stroke();
   c.beginPath(); c.moveTo(x0 + 8, y + 4); c.lineTo(x1 - 8, y + 4); c.lineWidth = 2.5; c.strokeStyle = "rgba(255,255,255,.55)"; c.stroke();
   c.beginPath(); c.strokeStyle = "#b67d45";
-  for (const [a, b, dy] of [[.04, .22, 10], [.31, .47, 8], [.55, .78, 11], [.84, .97, 9]]) { // wood grain, the same on every shelf
+  for (const [a, b, dy] of [[.04, .22, 10], [.31, .47, 8], [.55, .78, 11], [.84, .97, 9]]) {
     const xa = x0 + (x1 - x0) * a, xb = x0 + (x1 - x0) * b;
     c.moveTo(xa, y + dy); c.quadraticCurveTo((xa + xb) / 2, y + dy - 2.5, xb, y + dy);
   }
   c.stroke();
 }
-function drawPoster(canvas, me = state, them = null, plain = false) { // them set: the two sheets side by side in one picture; plain: no title
+function drawPoster(canvas, me = state, them = null, plain = false) {
   const rgb = hexToRgb(me.color), orgb = them && hexToRgb(them.color);
-  // comparing needs a second legend row and room under the labels for the other person's jar name
   const lift = plain ? 140 : 0, pitch = them ? 420 : 345, top0 = (them ? 310 : 260) - lift, H = them ? top0 + (ROWS - 1) * pitch + 420 : PH - lift;
   canvas.width = PW; canvas.height = H;
   const c = canvas.getContext("2d");
   c.fillStyle = "#fff"; c.fillRect(0, 0, PW, H);
 
   c.textBaseline = "alphabetic";
-  if (!plain) { // the visitor's own preview; an opened link has its own page heading instead
+  if (!plain) {
     c.fillStyle = INK; c.textAlign = "center"; c.font = "700 104px Oswald, Impact, 'Arial Narrow', sans-serif";
     c.fillText("Your kink jars", PW / 2, 140);
   }
   c.textAlign = "center"; c.font = "500 30px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
   c.fillText("(1 = a little  ·  5 = overflowing  ·  ? = curious  ·  X = hard limit)", PW / 2, 200 - lift);
-  if (them) { // who is on which side, and what the heart means
+  if (them) {
     const items = [[rgb, "left = You"], [orgb, "right = Them"], [0, "= you both said 4 or 5"]];
     const w = items.map(it => 34 + c.measureText(it[1]).width), total = w.reduce((s, v) => s + v + 44, -44), k = Math.min(1, (PW - 80) / total);
     c.save(); c.translate(PW / 2, 252 - lift); c.scale(k, k); c.textAlign = "left"; c.lineWidth = 3; c.lineJoin = "round"; c.strokeStyle = INK;
@@ -524,11 +516,11 @@ function drawPoster(canvas, me = state, them = null, plain = false) { // them se
     c.restore();
   }
 
-  for (let row = 0; row < ROWS; row++) shelf(c, 50, PW - 50, top0 + row * pitch + 170); // under the jars, so a puddle spills over it
+  for (let row = 0; row < ROWS; row++) shelf(c, 50, PW - 50, top0 + row * pitch + 170);
   JARS.forEach((label, i) => {
     const cx = PW / 2 + (i % COLS - (COLS - 1) / 2) * 150, top = top0 + Math.floor(i / COLS) * pitch;
     c.save(); c.translate(cx - 48, top);
-    if (them) { // one jar, two halves: mine on the left, their matching jar on the right
+    if (them) {
       const a = me.answers[i], b = them.answers[MATE[i]];
       drawJar(c, i, a, rgb, -1); drawJar(c, i, b, orgb, 1);
       c.beginPath(); c.moveTo(48, 27); c.lineTo(48, 168); c.lineWidth = 3; c.strokeStyle = INK; c.stroke();
@@ -538,8 +530,8 @@ function drawPoster(canvas, me = state, them = null, plain = false) { // them se
     let size = 30; c.font = `600 ${size}px Oswald, 'Arial Narrow', sans-serif`;
     while (label.some(l => c.measureText(l).width > 140) && size > 18) { size--; c.font = `600 ${size}px Oswald, 'Arial Narrow', sans-serif`; }
     c.fillStyle = INK; c.textAlign = "center";
-    label.forEach((l, k) => c.fillText(l, cx, top + 228 + k * (size + 4))); // clear of the shelf
-    if (them && MATE[i] !== i) { // name the jar the right half came from
+    label.forEach((l, k) => c.fillText(l, cx, top + 228 + k * (size + 4)));
+    if (them && MATE[i] !== i) {
       c.font = "500 22px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
       let y = top + 228 + (label.length - 1) * (size + 4) + 30, line = "";
       for (const w of ("+ " + JARS[MATE[i]].join(" ")).split(" ")) {
@@ -557,16 +549,12 @@ function drawMini(canvas, idx, level, rgb) {
   drawJar(c, idx, level, rgb);
 }
 
-/* ===== vector drawing =====
-   A stand-in for a canvas that builds an <svg> instead, so the read-only picture comes out of the same drawPoster and
-   drawJar as everything else. It covers only the canvas calls this file makes. Every shape is written in the
-   coordinates it was drawn in and carries the transform of that moment, which is right as long as a path is built and
-   painted under one transform (true everywhere here). Clipping opens a group that lasts until the matching restore(). */
+/* ===== vector drawing ===== */
 let svgIds = 0;
 function svgSurface(svg) {
   const NS = "http://www.w3.org/2000/svg", f = n => +n.toFixed(2), ruler = document.createElement("canvas").getContext("2d");
   const el = (name, attrs, parent) => { const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); return parent.appendChild(e); };
-  const KEEP = ["fillStyle", "strokeStyle", "lineWidth", "lineJoin", "lineCap", "font", "textAlign"]; // what save() remembers besides the transform and the group
+  const KEEP = ["fillStyle", "strokeStyle", "lineWidth", "lineJoin", "lineCap", "font", "textAlign"];
   return { width: 0, height: 0, getContext() {
     svg.replaceChildren(); svg.setAttribute("viewBox", `0 0 ${this.width} ${this.height}`);
     const defs = el("defs", {}, svg), stack = [];
@@ -587,15 +575,15 @@ function svgSurface(svg) {
       bezierCurveTo(a, b, p, q, x, y) { d += `C${f(a)} ${f(b)} ${f(p)} ${f(q)} ${to(x, y)}`; },
       closePath() { d += "Z"; },
       rect(x, y, w, h) { d += `M${to(x, y)}h${f(w)}v${f(h)}h${f(-w)}Z`; },
-      ellipse(x, y, rx, ry, rot, a0, a1) { // clockwise and unrotated only; a full turn is written as two halves
+      ellipse(x, y, rx, ry, rot, a0, a1) {
         const on = a => [x + rx * Math.cos(a), y + ry * Math.sin(a)], full = a1 - a0 >= Math.PI * 2, [sx, sy] = on(a0), [ex, ey] = on(full ? a0 + Math.PI : a1);
         c.lineTo(sx, sy); d += `A${f(rx)} ${f(ry)} 0 ${!full && a1 - a0 > Math.PI ? 1 : 0} 1 ${to(ex, ey)}`;
         if (full) d += `A${f(rx)} ${f(ry)} 0 0 1 ${to(sx, sy)}`;
       },
       arc(x, y, r, a0, a1) { c.ellipse(x, y, r, r, 0, a0, a1); },
-      arcTo(x1, y1, x2, y2, r) { // round the corner at (x1,y1) on the way to (x2,y2)
+      arcTo(x1, y1, x2, y2, r) {
         const ax = px - x1, ay = py - y1, bx = x2 - x1, by = y2 - y1, la = Math.hypot(ax, ay), lb = Math.hypot(bx, by);
-        const t = r / Math.tan(Math.acos((ax * bx + ay * by) / (la * lb)) / 2); // how far from the corner the curve starts and ends
+        const t = r / Math.tan(Math.acos((ax * bx + ay * by) / (la * lb)) / 2);
         c.lineTo(x1 + ax / la * t, y1 + ay / la * t);
         d += `A${f(r)} ${f(r)} 0 0 ${ax * by - ay * bx < 0 ? 1 : 0} ${to(x1 + bx / lb * t, y1 + by / lb * t)}`;
       },
@@ -618,28 +606,22 @@ function svgSurface(svg) {
   } };
 }
 
-/* ===== links =====
-   A sheet travels as a code of 28 letters and digits, on its own or after the # of a link (browsers never send that part to the host).
-   Its bits are the format (5, bumped with the jar set), the color (24), 3 per jar (0-7) and zeros to fill the last letter, written in
-   Crockford's base 32, which leaves out I, L, O and U so nothing reads as something else. One check letter follows, so a typo is
-   refused instead of opening someone else's jars. There are no names: an opened comparison calls the two sheets "You" and "Them". */
+/* ===== links ===== */
 const B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", FORMAT = 3, BITS = 5 + 24 + 3 * JARS.length, CODE = Math.ceil(BITS / 5) + 1;
 const bin = (v, n) => v.toString(2).padStart(n, "0");
-// the letters weighted 2, 3, 4, … and the check letter 1 add up to a multiple of 31: a wrong letter or two swapped ones break that,
-// short of a 0 standing in for a Z or the other way round
 const check = v => B32[(31 - v.reduce((s, x, i) => s + x * (i + 2), 0) % 31) % 31];
 function pack(s) {
   const bits = (bin(FORMAT, 5) + hexToRgb(s.color).map(x => bin(x, 8)).join("") + s.answers.map(a => bin(a, 3)).join("")).padEnd((CODE - 1) * 5, "0");
   const v = bits.match(/.{5}/g).map(b => parseInt(b, 2));
   return v.map(x => B32[x]).join("") + check(v);
 }
-function read(code) { // one whole code in capitals; null unless it is in this format and its check letter fits
+function read(code) {
   const v = [...code.slice(0, -1)].map(ch => B32.indexOf(ch));
   if (v[0] !== FORMAT || v.includes(-1) || check(v) !== code.at(-1)) return null;
   const bits = v.map(x => bin(x, 5)).join("");
   return { color: rgbToHex(bits.slice(5, 29).match(/.{8}/g).map(b => parseInt(b, 2))), answers: bits.slice(29, BITS).match(/.../g).map(b => parseInt(b, 2)) };
 }
-function unpack(text) { // takes a whole link or the code alone, in any case, with or without dashes or spaces, and words around either
+function unpack(text) {
   const words = text.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1").split(/[^0-9A-Z]+/);
   for (let i = 0; i < words.length; i++)
     for (let j = i, code = ""; j < words.length && code.length < CODE; j++) {
@@ -648,22 +630,19 @@ function unpack(text) { // takes a whole link or the code alone, in any case, wi
     }
   return null;
 }
-const group = code => code.match(/.{1,4}/g).join("-"); // how a code is shown, to read out or type in
-// the page's own address, as short as it gets: no #, no ?query (messengers tack tracking ones on), and over http no index.html,
-// which the server finds by itself. The address bar is tidied the same way at once, so a shared comparison is short too.
+const group = code => code.match(/.{1,4}/g).join("-");
 const home = location.href.split(/[?#]/)[0].replace(/^(https?:.*\/)index\.html$/, "$1");
 if (location.href !== home + location.hash) try { history.replaceState(null, "", home + location.hash); } catch (e) {}
 const myLink = () => home + "#" + pack(state);
 const bare = () => { try { history.replaceState(null, "", home); } catch (e) {} };
-function fromHash(h = location.hash) { // "#<code>" shows that sheet read-only, "#<code>+<code>" the two side by side. It stays in the address bar, so a reload keeps it.
+function fromHash(h = location.hash) {
   const [a, b = ""] = h.slice(1).split("+");
   shown = unpack(a); other = shown && unpack(b);
-  if (other && pack(other) === pack(state)) [shown, other] = [other, shown]; // no names, so the visitor's own sheet goes on the left as "You"
+  if (other && pack(other) === pack(state)) [shown, other] = [other, shown];
 }
 
 /* ===== UI ===== */
 const $ = id => document.getElementById(id);
-// the logo, also the tab icon: a house with a jar in it, filled with the page color
 const house = fill => `<path d="M6 29 32 7l26 22v28H6Z" fill="#fbf6ef" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>` +
   `<rect x="19" y="34" width="26" height="20" rx="5" fill="#fff"/><path d="M19 42h26v7a5 5 0 0 1-5 5H24a5 5 0 0 1-5-5Z" style="fill:${fill}"/>` +
   `<rect x="19" y="34" width="26" height="20" rx="5" fill="none" stroke="${INK}" stroke-width="3.5"/><rect x="21" y="28" width="22" height="6" rx="2" fill="#fff" stroke="${INK}" stroke-width="3"/>`;
@@ -716,7 +695,7 @@ function render() {
   const icon = "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${house(css(rgb))}</svg>`);
   if ($("icon").getAttribute("href") !== icon) $("icon").setAttribute("href", icon);
   document.body.classList.toggle("viewing", !!shown); $("view").hidden = !shown;
-  if (shown) { // a link, opened: one sheet, or two side by side, as a picture with nothing to edit
+  if (shown) {
     const mine = pack(shown) === pack(state), any = state.answers.some(Boolean);
     $("viewWho").textContent = other ? "Your & their" : mine ? "Your" : "Their";
     $("viewPic").setAttribute("aria-label", other ? "Your jars and theirs side by side" : mine ? "Your filled jars" : "Their filled jars");
@@ -743,7 +722,7 @@ function render() {
   drawPoster($("poster"));
 }
 
-async function share(url, note, field) { // phones get the share sheet; elsewhere the link is copied, or pointed at
+async function share(url, note, field) {
   if (matchMedia("(pointer: coarse)").matches && navigator.share) {
     try { await navigator.share({ title: document.title, url }); return; }
     catch (e) { if (e.name === "AbortError") return; }
@@ -773,7 +752,7 @@ $("cmpForm").onsubmit = e => {
 };
 
 /* ===== an opened link ===== */
-const versus = sheet => { location.hash = pack(state) + "+" + pack(sheet); scrollTo(0, 0); }; // my sheet beside theirs, as a link of its own
+const versus = sheet => { location.hash = pack(state) + "+" + pack(sheet); scrollTo(0, 0); };
 addEventListener("hashchange", () => { $("viewMsg").textContent = ""; fromHash(); update(); });
 $("viewCompare").onclick = () => versus(shown);
 $("viewShare").onclick = () => share(location.href, $("viewMsg"));
