@@ -7,7 +7,9 @@
 <meta name="description" content="Fill your jars, pick your color, share your link.">
 <meta property="og:title" content="Kink Jars">
 <meta property="og:description" content="Fill your jars, pick your color, share your link.">
+<meta property="og:site_name" content="kinks.casa">
 <meta name="robots" content="noindex">
+<link rel="icon" id="icon" href="data:,">
 <style>
   /* fonts: self-hosted in fonts/ so the page makes no third-party requests */
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-cyrillic-ext.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
@@ -15,7 +17,6 @@
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-vietnamese.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
   @font-face{font-family:Oswald;font-weight:500 700;font-display:swap;src:url(fonts/oswald-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-  @font-face{font-family:"Permanent Marker";font-weight:400;font-display:swap;src:url(fonts/permanent-marker-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
   @font-face{font-family:Nunito;font-weight:200 1000;font-display:swap;src:url(fonts/nunito-cyrillic-ext.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
   @font-face{font-family:Nunito;font-weight:200 1000;font-display:swap;src:url(fonts/nunito-cyrillic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
   @font-face{font-family:Nunito;font-weight:200 1000;font-display:swap;src:url(fonts/nunito-vietnamese.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
@@ -28,6 +29,8 @@
   body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:18px;line-height:1.45;padding-bottom:110px}
   @media(min-width:960px){body{padding-bottom:40px}}
   .wrap{max-width:1180px;margin:0 auto;padding:28px 16px}
+  .brand{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-family:Oswald,sans-serif;font-weight:600;font-size:20px;letter-spacing:.04em}
+  .brand svg{width:32px;height:32px}
   header{margin-bottom:22px}
   header h1{font-family:Oswald,sans-serif;font-weight:700;font-size:clamp(44px,9vw,68px);margin:0;line-height:1}
   header h1 span{color:var(--c);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
@@ -92,6 +95,9 @@
   .row{display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap}
   .row input{flex:1;min-width:0;width:auto;font-size:17px;padding:10px 12px}
   #mylink{margin-top:14px;font-size:15px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;color:var(--muted)}
+  .code{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:14px}
+  .code span{flex-basis:100%;font-size:15px;color:var(--muted)}
+  .code b{font-family:ui-monospace,Menlo,monospace;font-size:19px;letter-spacing:.03em;user-select:all;text-wrap:balance}
   .msg{margin:10px 0 0;font-size:15px;color:var(--muted)}
   .msg:empty{display:none}
   .viewing #top,.viewing .layout,.viewing .bar{display:none}
@@ -113,6 +119,7 @@
 </head>
 <body>
 <div class="wrap">
+  <p class="brand"><svg id="logo" viewBox="0 0 64 64" aria-hidden="true"></svg>kinks.casa</p>
   <section class="view" id="view" hidden>
     <header>
       <h1><b id="viewWho"></b> <span>jars</span></h1>
@@ -126,21 +133,14 @@
   </section>
 
   <header id="top">
-    <h1>Fill your <span>jars</span></h1>
-    <p>Pick a color, rate each one from 1 (a little) to 5 (overflowing), then share your link. Not your thing? Skip it and the jar stays empty.</p>
+    <h1>Welcome to the <span>pantry</span></h1>
+    <p>Pick a color, rate each jar from 1 (a little) to 5 (overflowing), then share your link. Not your thing? Skip it and the jar stays empty.</p>
   </header>
 
   <div class="layout">
     <main>
       <section class="panel">
         <div class="step">Step 1</div>
-        <h2>What's your name?</h2>
-        <p class="hint">It goes on the blank line at the top. Nickname is fine, or leave it blank.</p>
-        <input type="text" id="name" maxlength="24" autocomplete="off" placeholder="Your name">
-      </section>
-
-      <section class="panel">
-        <div class="step">Step 2</div>
         <h2>Pick your color</h2>
         <div class="picker">
           <div>
@@ -162,7 +162,7 @@
       </section>
 
       <section class="panel">
-        <div class="step">Step 3</div>
+        <div class="step">Step 2</div>
         <h2>Fill your jars</h2>
         <p class="hint">Tap a number, tag a jar as curious, or tape it shut as a hard limit. Tap again to undo.</p>
         <div id="questions"></div>
@@ -171,14 +171,19 @@
 
     <aside class="side">
       <section class="panel" id="done">
-        <div class="step">Step 4</div>
+        <div class="step">Step 3</div>
         <h2>Your jars</h2>
         <canvas class="poster" id="poster" aria-label="Preview of your filled jars"></canvas>
         <button class="big" id="share" type="button">Share my link</button>
         <input type="text" id="mylink" readonly aria-label="Your link">
+        <div class="code">
+          <span>Or give them your code</span>
+          <b id="mycode"></b>
+          <button class="ghost" id="copyCode" type="button">Copy code</button>
+        </div>
         <p class="msg" id="shareMsg" role="status"></p>
         <div class="small-links">
-          <span>Nothing leaves your phone until you share your link.</span>
+          <span>Nothing leaves your phone until you share your link or code.</span>
           <button class="linkbtn" id="reset" type="button">Start over</button>
         </div>
       </section>
@@ -186,9 +191,9 @@
       <section class="panel" id="cmp">
         <div class="step">Extra</div>
         <h2>Compare with someone</h2>
-        <p class="hint">Paste a link they shared from this page. You get one picture with every jar split in two, yours on the left and theirs on the right, and a link to it that you can share.</p>
+        <p class="hint">Paste a link they shared from this page, or type in their code. You get one picture with every jar split in two, yours on the left and theirs on the right, and a link to it that you can share.</p>
         <form class="row" id="cmpForm">
-          <input type="text" id="olink" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste their link" aria-label="Their link">
+          <input type="text" id="olink" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Their link or code" aria-label="Their link or code">
           <button class="ghost" type="submit">Compare</button>
         </form>
         <p class="msg" id="cmpMsg" role="status"></p>
@@ -258,14 +263,15 @@ const MATE = JARS.map((_, i) => i); PAIRS.forEach(([a, b]) => { MATE[a] = b; MAT
 const high = v => v === 4 || v === 5;
 
 /* ===== state ===== */
-let state = { name: "", color: "#e63946", answers: JARS.map(() => 0) }, firstVisit = true;
+let state = { color: "#e63946", answers: JARS.map(() => 0) }, firstVisit = true;
 try {
   localStorage.removeItem("kinkjars-v1"); // answers for the earlier jar set
   const s = JSON.parse(localStorage.getItem(STORE) || "null");
-  if (s && Array.isArray(s.answers)) { state = { ...state, ...s, answers: JARS.map((_, i) => s.answers[i] || 0) }; firstVisit = false; }
+  // only the color and the answers are taken, so a name saved back when the page asked for one is dropped on the next save
+  if (s && Array.isArray(s.answers)) { state = { color: s.color || state.color, answers: JARS.map((_, i) => s.answers[i] || 0) }; firstVisit = false; }
 } catch (e) {}
 const persist = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
-let shown = null; // the sheet { name, color, answers } of an opened link: it is shown read-only instead of the page, and never stored
+let shown = null; // the sheet { color, answers } of an opened link: it is shown read-only instead of the page, and never stored
 let other = null; // a second sheet, when the link holds two: the picture then sets it beside the first
 
 /* ===== color helpers ===== */
@@ -480,7 +486,17 @@ function drawJar(c, idx, level, rgb, half = 0) { // half: -1 or 1 draws only the
 }
 
 /* ===== poster ===== */
-function drawPoster(canvas, me = state, them = null, plain = false) { // them set: the two sheets side by side in one picture; plain: no title and name line
+function shelf(c, x0, x1, y) { // the wooden plank a row of jars stands on; y is its top, where the jars end
+  c.beginPath(); roundRect(c, x0, y, x1 - x0, 17, 6); c.fillStyle = "#e3b37c"; c.fill(); c.lineWidth = 4.5; c.strokeStyle = INK; c.stroke();
+  c.beginPath(); c.moveTo(x0 + 8, y + 4); c.lineTo(x1 - 8, y + 4); c.lineWidth = 2.5; c.strokeStyle = "rgba(255,255,255,.55)"; c.stroke();
+  c.beginPath(); c.strokeStyle = "#b67d45";
+  for (const [a, b, dy] of [[.04, .22, 10], [.31, .47, 8], [.55, .78, 11], [.84, .97, 9]]) { // wood grain, the same on every shelf
+    const xa = x0 + (x1 - x0) * a, xb = x0 + (x1 - x0) * b;
+    c.moveTo(xa, y + dy); c.quadraticCurveTo((xa + xb) / 2, y + dy - 2.5, xb, y + dy);
+  }
+  c.stroke();
+}
+function drawPoster(canvas, me = state, them = null, plain = false) { // them set: the two sheets side by side in one picture; plain: no title
   const rgb = hexToRgb(me.color), orgb = them && hexToRgb(them.color);
   // comparing needs a second legend row and room under the labels for the other person's jar name
   const lift = plain ? 140 : 0, pitch = them ? 420 : 345, top0 = (them ? 310 : 260) - lift, H = them ? top0 + (ROWS - 1) * pitch + 420 : PH - lift;
@@ -488,25 +504,15 @@ function drawPoster(canvas, me = state, them = null, plain = false) { // them se
   const c = canvas.getContext("2d");
   c.fillStyle = "#fff"; c.fillRect(0, 0, PW, H);
 
-  const mine = me.name.trim() || (them ? "me" : ""), theirs = them && (them.name.trim() || "them");
   c.textBaseline = "alphabetic";
-  if (!plain) { // the title, with the name written on the line beside it
-    c.fillStyle = INK; c.textAlign = "left";
-    c.font = "700 104px Oswald, Impact, 'Arial Narrow', sans-serif";
-    const tw = c.measureText("Kink Jars").width, lineW = 360, gap = 26, x0 = (PW - lineW - gap - tw) / 2, base = 140;
-    c.fillRect(x0, base - 5, lineW, 7);
-    c.fillText("Kink Jars", x0 + lineW + gap, base);
-    const name = them ? `${mine} + ${theirs}` : mine;
-    if (name) {
-      let size = 66; c.font = `${size}px "Permanent Marker", "Comic Sans MS", cursive`;
-      while (c.measureText(name).width > lineW - 12 && size > 20) { size -= 2; c.font = `${size}px "Permanent Marker", "Comic Sans MS", cursive`; }
-      c.textAlign = "center"; c.fillText(name, x0 + lineW / 2, base - 18, lineW - 12);
-    }
+  if (!plain) { // the visitor's own preview; an opened link has its own page heading instead
+    c.fillStyle = INK; c.textAlign = "center"; c.font = "700 104px Oswald, Impact, 'Arial Narrow', sans-serif";
+    c.fillText("Your kink jars", PW / 2, 140);
   }
   c.textAlign = "center"; c.font = "500 30px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
   c.fillText("(1 = a little  ·  5 = overflowing  ·  ? = curious  ·  X = hard limit)", PW / 2, 200 - lift);
   if (them) { // who is on which side, and what the heart means
-    const items = [[rgb, "left = " + mine], [orgb, "right = " + theirs], [0, "= you both said 4 or 5"]];
+    const items = [[rgb, "left = You"], [orgb, "right = Them"], [0, "= you both said 4 or 5"]];
     const w = items.map(it => 34 + c.measureText(it[1]).width), total = w.reduce((s, v) => s + v + 44, -44), k = Math.min(1, (PW - 80) / total);
     c.save(); c.translate(PW / 2, 252 - lift); c.scale(k, k); c.textAlign = "left"; c.lineWidth = 3; c.lineJoin = "round"; c.strokeStyle = INK;
     let x = -total / 2;
@@ -518,6 +524,7 @@ function drawPoster(canvas, me = state, them = null, plain = false) { // them se
     c.restore();
   }
 
+  for (let row = 0; row < ROWS; row++) shelf(c, 50, PW - 50, top0 + row * pitch + 170); // under the jars, so a puddle spills over it
   JARS.forEach((label, i) => {
     const cx = PW / 2 + (i % COLS - (COLS - 1) / 2) * 150, top = top0 + Math.floor(i / COLS) * pitch;
     c.save(); c.translate(cx - 48, top);
@@ -531,10 +538,10 @@ function drawPoster(canvas, me = state, them = null, plain = false) { // them se
     let size = 30; c.font = `600 ${size}px Oswald, 'Arial Narrow', sans-serif`;
     while (label.some(l => c.measureText(l).width > 140) && size > 18) { size--; c.font = `600 ${size}px Oswald, 'Arial Narrow', sans-serif`; }
     c.fillStyle = INK; c.textAlign = "center";
-    label.forEach((l, k) => c.fillText(l, cx, top + 170 + 44 + k * (size + 4)));
+    label.forEach((l, k) => c.fillText(l, cx, top + 228 + k * (size + 4))); // clear of the shelf
     if (them && MATE[i] !== i) { // name the jar the right half came from
       c.font = "500 22px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
-      let y = top + 214 + (label.length - 1) * (size + 4) + 30, line = "";
+      let y = top + 228 + (label.length - 1) * (size + 4) + 30, line = "";
       for (const w of ("+ " + JARS[MATE[i]].join(" ")).split(" ")) {
         if (line && c.measureText(line + " " + w).width > 140) { c.fillText(line, cx, y); y += 26; line = w; } else line = line ? line + " " + w : w;
       }
@@ -612,25 +619,55 @@ function svgSurface(svg) {
 }
 
 /* ===== links =====
-   A sheet travels as a link. Everything sits after the #, which browsers never send to the host.
-   "2" (the format, bumped with the jar set) + color (6 hex) + one digit per jar (0-7) + the name as UTF-8 hex. */
-const pack = s => "2" + rgbToHex(hexToRgb(s.color)).slice(1) + s.answers.join("") + [...new TextEncoder().encode(s.name.trim())].map(b => b.toString(16).padStart(2, "0")).join("");
-function unpack(text) { // takes a whole link, or just the part after the #
-  const m = new RegExp(`(?:^|#)2([0-9a-f]{6})([0-7]{${JARS.length}})((?:[0-9a-f]{2})*)`).exec(text.trim().toLowerCase());
-  if (!m) return null;
-  let name = "";
-  try { name = new TextDecoder("utf-8", { fatal: true }).decode(Uint8Array.from(m[3].match(/../g) || [], h => parseInt(h, 16))); } catch (e) {}
-  return { name: name.slice(0, 24), color: "#" + m[1], answers: [...m[2]].map(Number) };
+   A sheet travels as a code of 28 letters and digits, on its own or after the # of a link (browsers never send that part to the host).
+   Its bits are the format (5, bumped with the jar set), the color (24), 3 per jar (0-7) and zeros to fill the last letter, written in
+   Crockford's base 32, which leaves out I, L, O and U so nothing reads as something else. One check letter follows, so a typo is
+   refused instead of opening someone else's jars. There are no names: an opened comparison calls the two sheets "You" and "Them". */
+const B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", FORMAT = 3, BITS = 5 + 24 + 3 * JARS.length, CODE = Math.ceil(BITS / 5) + 1;
+const bin = (v, n) => v.toString(2).padStart(n, "0");
+// the letters weighted 2, 3, 4, … and the check letter 1 add up to a multiple of 31: a wrong letter or two swapped ones break that,
+// short of a 0 standing in for a Z or the other way round
+const check = v => B32[(31 - v.reduce((s, x, i) => s + x * (i + 2), 0) % 31) % 31];
+function pack(s) {
+  const bits = (bin(FORMAT, 5) + hexToRgb(s.color).map(x => bin(x, 8)).join("") + s.answers.map(a => bin(a, 3)).join("")).padEnd((CODE - 1) * 5, "0");
+  const v = bits.match(/.{5}/g).map(b => parseInt(b, 2));
+  return v.map(x => B32[x]).join("") + check(v);
 }
-const myLink = () => location.href.split("#")[0] + "#" + pack(state);
-const bare = () => { try { history.replaceState(null, "", location.href.split("#")[0]); } catch (e) {} };
-function fromHash(h = location.hash) { // "#<sheet>" shows that sheet read-only, "#<sheet>vs<sheet>" the two side by side. It stays in the address bar, so a reload keeps it.
-  const i = h.indexOf("vs");
-  shown = unpack(i < 0 ? h : h.slice(0, i)); other = shown && i > 0 ? unpack(h.slice(i + 2)) : null;
+function read(code) { // one whole code in capitals; null unless it is in this format and its check letter fits
+  const v = [...code.slice(0, -1)].map(ch => B32.indexOf(ch));
+  if (v[0] !== FORMAT || v.includes(-1) || check(v) !== code.at(-1)) return null;
+  const bits = v.map(x => bin(x, 5)).join("");
+  return { color: rgbToHex(bits.slice(5, 29).match(/.{8}/g).map(b => parseInt(b, 2))), answers: bits.slice(29, BITS).match(/.../g).map(b => parseInt(b, 2)) };
+}
+function unpack(text) { // takes a whole link or the code alone, in any case, with or without dashes or spaces, and words around either
+  const words = text.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1").split(/[^0-9A-Z]+/);
+  for (let i = 0; i < words.length; i++)
+    for (let j = i, code = ""; j < words.length && code.length < CODE; j++) {
+      const s = (code += words[j]).length === CODE && read(code);
+      if (s) return s;
+    }
+  return null;
+}
+const group = code => code.match(/.{1,4}/g).join("-"); // how a code is shown, to read out or type in
+// the page's own address, as short as it gets: no #, no ?query (messengers tack tracking ones on), and over http no index.html,
+// which the server finds by itself. The address bar is tidied the same way at once, so a shared comparison is short too.
+const home = location.href.split(/[?#]/)[0].replace(/^(https?:.*\/)index\.html$/, "$1");
+if (location.href !== home + location.hash) try { history.replaceState(null, "", home + location.hash); } catch (e) {}
+const myLink = () => home + "#" + pack(state);
+const bare = () => { try { history.replaceState(null, "", home); } catch (e) {} };
+function fromHash(h = location.hash) { // "#<code>" shows that sheet read-only, "#<code>+<code>" the two side by side. It stays in the address bar, so a reload keeps it.
+  const [a, b = ""] = h.slice(1).split("+");
+  shown = unpack(a); other = shown && unpack(b);
+  if (other && pack(other) === pack(state)) [shown, other] = [other, shown]; // no names, so the visitor's own sheet goes on the left as "You"
 }
 
 /* ===== UI ===== */
 const $ = id => document.getElementById(id);
+// the logo, also the tab icon: a house with a jar in it, filled with the page color
+const house = fill => `<path d="M6 29 32 7l26 22v28H6Z" fill="#fbf6ef" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>` +
+  `<rect x="19" y="34" width="26" height="20" rx="5" fill="#fff"/><path d="M19 42h26v7a5 5 0 0 1-5 5H24a5 5 0 0 1-5-5Z" style="fill:${fill}"/>` +
+  `<rect x="19" y="34" width="26" height="20" rx="5" fill="none" stroke="${INK}" stroke-width="3.5"/><rect x="21" y="28" width="22" height="6" rx="2" fill="#fff" stroke="${INK}" stroke-width="3"/>`;
+$("logo").innerHTML = house("var(--c)");
 const qWrap = $("questions"), minis = [];
 JARS.forEach((label, i) => {
   const text = label.join(" ");
@@ -668,8 +705,6 @@ $("hex").addEventListener("input", e => {
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) setColor(rgbToHex(hexToRgb(v)), true);
 });
 $("surprise").onclick = () => setColor(randomColor());
-$("name").value = state.name;
-$("name").addEventListener("input", e => { state.name = e.target.value; persist(); update(); });
 
 function setColor(hex, fromHexBox) { state.color = hex.toLowerCase(); persist(); if (!fromHexBox) $("hex").value = state.color.toUpperCase(); update(); }
 
@@ -678,11 +713,13 @@ function update() { if (queued) return; queued = true; requestAnimationFrame(() 
 function render() {
   const rgb = hexToRgb((shown || state).color), root = document.documentElement.style;
   root.setProperty("--c", css(rgb)); root.setProperty("--on-c", lum(rgb) > 0.6 ? INK : "#fff");
+  const icon = "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${house(css(rgb))}</svg>`);
+  if ($("icon").getAttribute("href") !== icon) $("icon").setAttribute("href", icon);
   document.body.classList.toggle("viewing", !!shown); $("view").hidden = !shown;
   if (shown) { // a link, opened: one sheet, or two side by side, as a picture with nothing to edit
-    const mine = pack(shown) === pack(state), any = state.answers.some(Boolean), who = shown.name || "Someone", them = other && (other.name || "someone");
-    $("viewWho").textContent = other ? `${who} & ${them}'s` : who + "'s";
-    $("viewPic").setAttribute("aria-label", other ? `${who}'s and ${them}'s jars side by side` : `${who}'s filled jars`);
+    const mine = pack(shown) === pack(state), any = state.answers.some(Boolean);
+    $("viewWho").textContent = other ? "Your & their" : mine ? "Your" : "Their";
+    $("viewPic").setAttribute("aria-label", other ? "Your jars and theirs side by side" : mine ? "Your filled jars" : "Their filled jars");
     $("viewCompare").hidden = !!other || mine || !any; $("viewShare").hidden = !other; $("viewAdopt").hidden = !!other || mine;
     $("viewAsk").textContent = any ? "Back to your own jars?" : "Want to create your own?";
     return drawPoster(svgSurface($("viewPic")), shown, other, true);
@@ -702,7 +739,7 @@ function render() {
   const n = state.answers.filter(Boolean).length;
   $("progress").textContent = `${n} of ${JARS.length} answered`;
   const link = myLink();
-  if ($("mylink").value !== link) { $("mylink").value = link; $("shareMsg").textContent = ""; }
+  if ($("mylink").value !== link) { $("mylink").value = link; $("mycode").textContent = group(pack(state)); $("shareMsg").textContent = ""; }
   drawPoster($("poster"));
 }
 
@@ -716,36 +753,40 @@ async function share(url, note, field) { // phones get the share sheet; elsewher
 }
 $("share").onclick = $("shareBar").onclick = () => share(myLink(), $("shareMsg"), $("mylink"));
 $("mylink").onfocus = e => e.target.select();
+$("copyCode").onclick = async () => {
+  try { await navigator.clipboard.writeText($("mycode").textContent); $("shareMsg").textContent = "Code copied. They can type it in under “Compare with someone”."; }
+  catch (e) { getSelection().selectAllChildren($("mycode")); $("shareMsg").textContent = "Copy the code above and send it."; }
+};
 $("reset").onclick = () => {
   if (!confirm("Empty all the jars and start over?")) return;
-  state.answers = JARS.map(() => 0); state.name = ""; $("name").value = ""; say(""); persist(); update(); scrollTo({ top: 0, behavior: "smooth" });
+  state.answers = JARS.map(() => 0); say(""); persist(); update(); scrollTo({ top: 0, behavior: "smooth" });
 };
 
 /* ===== compare with someone ===== */
 function say(text) { $("cmpMsg").textContent = text; }
 $("cmpForm").onsubmit = e => {
   e.preventDefault();
-  const sheet = unpack($("olink").value);
-  if (!sheet) return say("That doesn't look like a link from this page.");
-  if (pack(sheet) === pack(state)) return say("That one is your own link.");
+  const text = $("olink").value, sheet = unpack(text);
+  if (!sheet) return say(text.replace(/[\s-]/g, "").length === CODE ? "That code has a typo somewhere. Check it against theirs." : "That doesn't look like a link or code from this page.");
+  if (pack(sheet) === pack(state)) return say("That one is yours.");
   $("olink").value = ""; say(""); versus(sheet);
 };
 
 /* ===== an opened link ===== */
-const versus = sheet => { location.hash = pack(state) + "vs" + pack(sheet); scrollTo(0, 0); }; // my sheet beside theirs, as a link of its own
+const versus = sheet => { location.hash = pack(state) + "+" + pack(sheet); scrollTo(0, 0); }; // my sheet beside theirs, as a link of its own
 addEventListener("hashchange", () => { $("viewMsg").textContent = ""; fromHash(); update(); });
 $("viewCompare").onclick = () => versus(shown);
 $("viewShare").onclick = () => share(location.href, $("viewMsg"));
 $("viewOwn").onclick = () => { shown = other = null; bare(); update(); scrollTo(0, 0); };
 $("adopt").onclick = () => {
   if (state.answers.some(Boolean) && !confirm("Swap the jars you have now for these?")) return;
-  state = shown; shown = null; $("name").value = state.name; bare(); persist(); update(); scrollTo(0, 0);
+  state = shown; shown = null; bare(); persist(); update(); scrollTo(0, 0);
 };
 
 fromHash();
 
 render();
-Promise.all(["700 104px Oswald, Impact, 'Arial Narrow', sans-serif", "600 30px Oswald", "500 30px Oswald, 'Arial Narrow', sans-serif", '66px "Permanent Marker"'].map(f => document.fonts.load(f)))
+Promise.all(["700 104px Oswald, Impact, 'Arial Narrow', sans-serif", "600 30px Oswald", "500 30px Oswald, 'Arial Narrow', sans-serif"].map(f => document.fonts.load(f)))
   .catch(() => {}).then(() => document.fonts.ready).then(render);
 </script>
 </body>
