@@ -36,6 +36,9 @@
   header p{margin:10px 0 0;color:var(--muted);max-width:640px}
   .layout{display:grid;gap:24px}
   .side{display:contents}
+  #cmp{display:none!important}
+  #view{display:none!important}
+  #share,#shareBar,#mylink,.code,#shareMsg{display:none!important}
   @media(min-width:960px){.layout{grid-template-columns:minmax(0,1fr) 430px}.side{display:block;position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin}#cmp{margin-bottom:20px}}
   .panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:20px;margin-bottom:20px}
   .step{font-family:Oswald,sans-serif;font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -89,8 +92,21 @@
   .small-links{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-size:15px;color:var(--muted)}
   .linkbtn{background:none;border:0;padding:4px 0;text-decoration:underline;color:var(--muted);font-size:15px;white-space:nowrap}
   [hidden]{display:none!important}
+  .row{display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap}
+  .row input{flex:1;min-width:0;width:auto;font-size:17px;padding:10px 12px}
+  #mylink{margin-top:14px;font-size:15px;padding:10px 12px;font-family:ui-monospace,Menlo,monospace;color:var(--muted)}
+  .code{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:14px}
+  .code span{flex-basis:100%;font-size:15px;color:var(--muted)}
+  .code b{font-family:ui-monospace,Menlo,monospace;font-size:19px;letter-spacing:.03em;user-select:all;text-wrap:balance}
   .msg{margin:10px 0 0;font-size:15px;color:var(--muted)}
   .msg:empty{display:none}
+  .viewing #top,.viewing .layout,.viewing .bar{display:none}
+  .view{max-width:760px;margin:0 auto}
+  .view h1 b{font-weight:inherit}
+  .view .msg{text-align:center}
+  .viewfoot{margin:22px 0 0;text-align:center;color:var(--muted)}
+  .viewfoot + .viewfoot{margin-top:6px}
+  .viewfoot .linkbtn{font-size:inherit;color:var(--ink);font-weight:700}
 
   .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(251,246,239,.96);border-top:2px solid var(--line);backdrop-filter:blur(6px);z-index:5}
   .bar-in{max-width:1180px;margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:14px}
@@ -104,6 +120,18 @@
 <body>
 <div class="wrap">
   <p class="brand"><svg id="logo" viewBox="0 0 64 64" aria-hidden="true"></svg>kinks.mlm</p>
+  <section class="view" id="view" hidden>
+    <header>
+      <h1><b id="viewWho"></b> <span>jars</span></h1>
+    </header>
+    <svg class="poster" id="viewPic" role="img"></svg>
+    <button class="big" id="viewCompare" type="button">Compare with mine</button>
+    <button class="big" id="viewShare" type="button">Share this comparison</button>
+    <p class="msg" id="viewMsg" role="status"></p>
+    <p class="viewfoot"><span id="viewAsk">Want to create your own?</span> <button class="linkbtn" id="viewOwn" type="button">Click here</button></p>
+    <p class="viewfoot" id="viewAdopt">Are these yours? <button class="linkbtn" id="adopt" type="button">Use them as my own jars</button></p>
+  </section>
+
   <header id="top">
     <h1>Welcome to the <span>pantry</span></h1>
     <p>Pick a color and rate each jar from 1 (a little) to 5 (overflowing). Save your finished jars as a picture whenever you like. Not your thing? Skip it and the jar stays empty.</p>
@@ -153,10 +181,31 @@
         <h2>Your jars</h2>
         <canvas class="poster" id="poster" aria-label="Preview of your filled jars"></canvas>
         <button class="big" id="saveJar" type="button">Save my Jar</button>
-        <p class="msg" id="saveMsg" role="status"></p>
-        <div class="small-links"><span>Your name and jar settings are saved in this browser on this device.</span><button class="linkbtn" id="reset" type="button">Start over</button></div>
+        <button class="big" id="share" type="button">Share my link</button>
+        <input type="text" id="mylink" readonly aria-label="Your link">
+        <div class="code">
+          <span>Or give them your code</span>
+          <b id="mycode"></b>
+          <button class="ghost" id="copyCode" type="button">Copy code</button>
+        </div>
+        <p class="msg" id="shareMsg" role="status"></p>
+        <p class="hint">Privacy: your name, color, and jar ratings stay in this browser on your device. The site does not send them to a personal server or database. GitHub Pages may collect technical data such as visitor IP addresses.</p>
+        <div class="small-links">
+          <span>Your name and jar settings are saved in this browser on this device.</span>
+          <button class="linkbtn" id="reset" type="button">Start over</button>
+        </div>
       </section>
-      <section class="panel privacy"><h2>Privacy</h2><p>Your name, color, and jar ratings are saved in this browser on your device. This site does not send them to a personal server or database. GitHub Pages hosts this website and may collect technical information such as visitor IP addresses. Saving a jar creates an image file on your device.</p></section>
+
+      <section class="panel" id="cmp">
+        <div class="step">Extra</div>
+        <h2>Compare with someone</h2>
+        <p class="hint">Paste a link they shared from this page, or type in their code. You get one picture with every jar split in two, yours on the left and theirs on the right, and a link to it that you can share.</p>
+        <form class="row" id="cmpForm">
+          <input type="text" id="olink" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Their link or code" aria-label="Their link or code">
+          <button class="ghost" type="submit">Compare</button>
+        </form>
+        <p class="msg" id="cmpMsg" role="status"></p>
+      </section>
     </aside>
   </div>
 </div>
@@ -549,8 +598,12 @@ const MATE = JARS.map((_, i) => i); PAIRS.forEach(([a, b]) => { MATE[a] = b; MAT
 const high = v => v === 4 || v === 5;
 
 /* ===== state ===== */
-let state = { color: "#e63946", answers: JARS.map(() => 0) };
-try { const s = JSON.parse(localStorage.getItem(STORE) || "null"); if (s && Array.isArray(s.answers)) state = { color: s.color || state.color, answers: JARS.map((_, i) => s.answers[i] || 0) }; } catch (e) {}
+let state = { color: "#e63946", answers: JARS.map(() => 0) }, firstVisit = true;
+try {
+  localStorage.removeItem("kinkjars-v1");
+  const s = JSON.parse(localStorage.getItem(STORE) || "null");
+  if (s && Array.isArray(s.answers)) { state = { color: s.color || state.color, answers: JARS.map((_, i) => s.answers[i] || 0) }; firstVisit = false; }
+} catch (e) {}
 const persist = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
 let shown = null;
 let other = null;
@@ -894,6 +947,40 @@ function svgSurface(svg) {
 }
 
 /* ===== links ===== */
+const B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ", FORMAT = 4, BITS = 5 + 24 + 3 * JARS.length, CODE = Math.ceil(BITS / 5) + 1;
+const bin = (v, n) => v.toString(2).padStart(n, "0");
+const check = v => B32[(31 - v.reduce((s, x, i) => s + x * (i + 2), 0) % 31) % 31];
+function pack(s) {
+  const bits = (bin(FORMAT, 5) + hexToRgb(s.color).map(x => bin(x, 8)).join("") + s.answers.map(a => bin(a, 3)).join("")).padEnd((CODE - 1) * 5, "0");
+  const v = bits.match(/.{5}/g).map(b => parseInt(b, 2));
+  return v.map(x => B32[x]).join("") + check(v);
+}
+function read(code) {
+  const v = [...code.slice(0, -1)].map(ch => B32.indexOf(ch));
+  if (v[0] !== FORMAT || v.includes(-1) || check(v) !== code.at(-1)) return null;
+  const bits = v.map(x => bin(x, 5)).join("");
+  return { color: rgbToHex(bits.slice(5, 29).match(/.{8}/g).map(b => parseInt(b, 2))), answers: bits.slice(29, BITS).match(/.../g).map(b => parseInt(b, 2)) };
+}
+function unpack(text) {
+  const words = text.toUpperCase().replace(/O/g, "0").replace(/[IL]/g, "1").split(/[^0-9A-Z]+/);
+  for (let i = 0; i < words.length; i++)
+    for (let j = i, code = ""; j < words.length && code.length < CODE; j++) {
+      const s = (code += words[j]).length === CODE && read(code);
+      if (s) return s;
+    }
+  return null;
+}
+const group = code => code.match(/.{1,4}/g).join("-");
+const home = location.href.split(/[?#]/)[0].replace(/^(https?:.*\/)index\.html$/, "$1");
+if (location.href !== home + location.hash) try { history.replaceState(null, "", home + location.hash); } catch (e) {}
+const myLink = () => home + "#" + pack(state);
+const bare = () => { try { history.replaceState(null, "", home); } catch (e) {} };
+function fromHash(h = location.hash) {
+  const [a, b = ""] = h.slice(1).split("+");
+  shown = unpack(a); other = shown && unpack(b);
+  if (other && pack(other) === pack(state)) [shown, other] = [other, shown];
+}
+
 /* ===== UI ===== */
 const $ = id => document.getElementById(id);
 const house = fill => `<path d="M6 29 32 7l26 22v28H6Z" fill="#fbf6ef" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>` +
@@ -943,7 +1030,15 @@ function render() {
   root.setProperty("--c", css(rgb)); root.setProperty("--on-c", lum(rgb) > 0.6 ? INK : "#fff");
   const icon = "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${house(css(rgb))}</svg>`);
   if ($("icon").getAttribute("href") !== icon) $("icon").setAttribute("href", icon);
-  $("view").hidden = true;
+  document.body.classList.toggle("viewing", !!shown); $("view").hidden = !shown;
+  if (shown) {
+    const mine = pack(shown) === pack(state), any = state.answers.some(Boolean);
+    $("viewWho").textContent = LANG === "fa" ? (other ? "شیشه‌های شما و طرف مقابل" : mine ? "شیشه‌های شما" : "شیشه‌های طرف مقابل") : other ? "Your & their" : mine ? "Your" : "Their";
+    $("viewPic").setAttribute("aria-label", LANG === "fa" ? (other ? "شیشه‌های شما و طرف مقابل کنار هم" : mine ? "شیشه‌های پرشدهٔ شما" : "شیشه‌های پرشدهٔ طرف مقابل") : other ? "Your jars and theirs side by side" : mine ? "Your filled jars" : "Their filled jars");
+    $("viewCompare").hidden = !!other || mine || !any; $("viewShare").hidden = !other; $("viewAdopt").hidden = !!other || mine;
+    $("viewAsk").textContent = LANG === "fa" ? (any ? "بازگشت به شیشه‌های خودتان؟" : "می‌خواهید شیشه‌های خودتان را بسازید؟") : any ? "Back to your own jars?" : "Want to create your own?";
+    return drawPoster(svgSurface($("viewPic")), shown, other, true);
+  }
   ["r", "g", "b"].forEach((k, n) => {
     $(k).value = rgb[n]; $(k + "v").textContent = rgb[n];
     const lo = [...rgb], hi = [...rgb]; lo[n] = 0; hi[n] = 255;
@@ -958,9 +1053,19 @@ function render() {
   });
   const n = state.answers.filter(Boolean).length;
   $("progress").textContent = `${n} of ${JARS.length} answered`;
+  const link = myLink();
+  if ($("mylink").value !== link) { $("mylink").value = link; $("mycode").textContent = group(pack(state)); $("shareMsg").textContent = ""; }
   drawPoster($("poster"));
 }
 
+async function share(url, note, field) {
+  if (matchMedia("(pointer: coarse)").matches && navigator.share) {
+    try { await navigator.share({ title: document.title, url }); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(url); note.textContent = LANG === "fa" ? UI_FA.copied : "Link copied. Send it to whoever should see it."; }
+  catch (e) { if (field) field.focus(); note.textContent = field ? "Copy the link above and send it." : "Copy the address of this page and send it."; }
+}
 $("saveJar").onclick = () => {
   try {
     const image = document.createElement("canvas");
@@ -970,21 +1075,36 @@ $("saveJar").onclick = () => {
     link.download = safeName + "-kink-jars.png";
     link.href = image.toDataURL("image/png");
     link.click();
-    $("saveMsg").textContent = "Your jar image has been saved.";
+    $("shareMsg").textContent = "Your jar image has been saved.";
   } catch (err) {
-    $("saveMsg").textContent = "Couldn't save the image. Please try again in your browser.";
+    $("shareMsg").textContent = "Couldn't save the image. Please try again in your browser.";
   }
 };
+$("share").onclick = $("shareBar").onclick = () => share(myLink(), $("shareMsg"), $("mylink"));
+$("mylink").onfocus = e => e.target.select();
 $("copyCode").onclick = async () => {
-  try { await navigator.clipboard.writeText($("mycode").textContent); $("saveMsg").textContent = LANG === "fa" ? UI_FA.codeCopied : "Code copied. They can type it in under “Compare with someone”."; }
-  catch (e) { getSelection().selectAllChildren($("mycode")); $("saveMsg").textContent = "Copy the code above and send it."; }
+  try { await navigator.clipboard.writeText($("mycode").textContent); $("shareMsg").textContent = LANG === "fa" ? UI_FA.codeCopied : "Code copied. They can type it in under “Compare with someone”."; }
+  catch (e) { getSelection().selectAllChildren($("mycode")); $("shareMsg").textContent = "Copy the code above and send it."; }
 };
 $("reset").onclick = () => {
   if (!confirm(LANG === "fa" ? UI_FA.resetConfirm : "Empty all the jars and start over?")) return;
   state.answers = JARS.map(() => 0); say(""); persist(); update(); scrollTo({ top: 0, behavior: "smooth" });
 };
 
- update(); });
+/* ===== compare with someone ===== */
+function say(text) { $("cmpMsg").textContent = text; }
+$("cmpForm").onsubmit = e => {
+  e.preventDefault();
+  const text = $("olink").value, sheet = unpack(text);
+  if (!sheet) return say(text.replace(/[\s-]/g, "").length === CODE ? "That code has a typo somewhere. Check it against theirs." : "That doesn't look like a link or code from this page.");
+  if (pack(sheet) === pack(state)) return say(LANG === "fa" ? UI_FA.same : "That one is yours.");
+  $("olink").value = ""; say(""); versus(sheet);
+};
+
+/* ===== an opened link ===== */
+const versus = sheet => { location.hash = pack(state) + "+" + pack(sheet); scrollTo(0, 0); };
+addEventListener("hashchange", () => { $("viewMsg").textContent = ""; fromHash(); update(); });
+$("viewCompare").onclick = () => versus(shown);
 $("viewShare").onclick = () => share(location.href, $("viewMsg"));
 $("viewOwn").onclick = () => { shown = other = null; bare(); update(); scrollTo(0, 0); };
 $("adopt").onclick = () => {
@@ -992,9 +1112,9 @@ $("adopt").onclick = () => {
   state = shown; shown = null; bare(); persist(); update(); scrollTo(0, 0);
 };
 
+fromHash();
 $("personName").value = personName;
 $("personName").addEventListener("input", e => { personName = e.target.value; try { localStorage.setItem("kinkjars-name", personName); } catch(err) {} update(); });
-$("reset").onclick = () => { if (!confirm("Empty all the jars and start over?")) return; state.answers = JARS.map(() => 0); persist(); update(); scrollTo({ top: 0, behavior: "smooth" }); };
 $("saveBar").onclick = () => $("saveJar").click();
 render();
 Promise.all(["700 104px Oswald, Impact, 'Arial Narrow', sans-serif", "600 30px Oswald", "500 30px Oswald, 'Arial Narrow', sans-serif"].map(f => document.fonts.load(f)))
