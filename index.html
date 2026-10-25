@@ -113,7 +113,7 @@
   @media(min-width:960px){.bar{display:none}}
 
   .privacy{font-size:14px;color:var(--muted);text-align:center;margin-top:8px}
-  .about-fa{direction:rtl;text-align:right;font-family:Tahoma,Arial,sans-serif;border-top:1px solid var(--line);padding-top:8px;margin-top:8px}\n  #langToggle{margin-left:auto;font-size:14px}\n  .farsi{font-family:Tahoma,Arial,sans-serif}\n  .farsi .brand,.farsi h1,.farsi h2,.farsi .step,.farsi .qlabel,.farsi .scale button,.farsi .big{font-family:Tahoma,Arial,sans-serif}\n  .farsi .ends,.farsi .row,.farsi .small-links,.farsi .bar-in{direction:rtl}\n</style>
+  .about-fa{direction:rtl;text-align:right;font-family:Tahoma,Arial,sans-serif;border-top:1px solid var(--line);padding-top:8px;margin-top:8px}\n</style>
 </head>
 <body>
 <div class="wrap">
@@ -876,12 +876,6 @@ JARS.forEach((label, i) => {
   q.querySelector(".qlabel").textContent = JAR_LABELS_EN[i];
   q.querySelector(".about").textContent = ABOUT_EN[i];
   q.querySelector(".about-fa").textContent = JARS_FA[i][0] + " — " + ABOUT_FA[i];
-  if (false && ABOUT[text.toLowerCase()]) {
-    const p = q.querySelector(".about"), b = document.createElement("button"); b.type = "button"; b.className = "linkbtn"; b.textContent = "What's this?";
-    p.textContent = ABOUT[text.toLowerCase()]; p.id = "about" + i; b.setAttribute("aria-controls", p.id); b.setAttribute("aria-expanded", false);
-    b.onclick = () => { p.hidden = !p.hidden; b.setAttribute("aria-expanded", !p.hidden); };
-    q.querySelector(".qnum").append(" · ", b);
-  }
   const sc = q.querySelector(".scale"), mk = q.querySelector(".marks"), buttons = []; sc.setAttribute("aria-label", text);
   for (let v = 1; v <= LIMIT; v++) {
     const b = document.createElement("button"); b.type = "button"; b.textContent = MARKS[v] || v;
