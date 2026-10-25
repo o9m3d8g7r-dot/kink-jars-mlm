@@ -178,6 +178,7 @@
         <div class="step">Step 4</div>
         <h2>Your jars</h2>
         <canvas class="poster" id="poster" aria-label="Preview of your filled jars"></canvas>
+        <button class="big" id="saveJar" type="button">Save my Jar</button>
         <button class="big" id="share" type="button">Share my link</button>
         <input type="text" id="mylink" readonly aria-label="Your link">
         <div class="code">
@@ -1062,6 +1063,20 @@ async function share(url, note, field) {
   try { await navigator.clipboard.writeText(url); note.textContent = LANG === "fa" ? UI_FA.copied : "Link copied. Send it to whoever should see it."; }
   catch (e) { if (field) field.focus(); note.textContent = field ? "Copy the link above and send it." : "Copy the address of this page and send it."; }
 }
+$("saveJar").onclick = () => {
+  try {
+    const image = document.createElement("canvas");
+    drawPoster(image, state, null, false);
+    const link = document.createElement("a");
+    const safeName = (personName || "my").trim().replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "my";
+    link.download = safeName + "-kink-jars.png";
+    link.href = image.toDataURL("image/png");
+    link.click();
+    $("shareMsg").textContent = "Your jar image has been saved.";
+  } catch (err) {
+    $("shareMsg").textContent = "Couldn't save the image. Please try again in your browser.";
+  }
+};
 $("share").onclick = $("shareBar").onclick = () => share(myLink(), $("shareMsg"), $("mylink"));
 $("mylink").onfocus = e => e.target.select();
 $("copyCode").onclick = async () => {
