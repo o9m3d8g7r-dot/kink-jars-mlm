@@ -112,12 +112,12 @@
   .bar .big{width:auto;margin:0;padding:12px 22px;font-size:21px;box-shadow:0 4px 0 var(--ink)}
   @media(min-width:960px){.bar{display:none}}
 
-  .privacy{font-size:14px;color:var(--muted);text-align:center;margin-top:8px}\n  #langToggle{margin-left:auto;font-size:14px}\n  .farsi{font-family:Tahoma,Arial,sans-serif}\n  .farsi .brand,.farsi h1,.farsi h2,.farsi .step,.farsi .qlabel,.farsi .scale button,.farsi .big{font-family:Tahoma,Arial,sans-serif}\n  .farsi .ends,.farsi .row,.farsi .small-links,.farsi .bar-in{direction:rtl}\n  .farsi .code b{direction:ltr}
-</style>
+  .privacy{font-size:14px;color:var(--muted);text-align:center;margin-top:8px}
+  .about-fa{direction:rtl;text-align:right;font-family:Tahoma,Arial,sans-serif;border-top:1px solid var(--line);padding-top:8px;margin-top:8px}\n  #langToggle{margin-left:auto;font-size:14px}\n  .farsi{font-family:Tahoma,Arial,sans-serif}\n  .farsi .brand,.farsi h1,.farsi h2,.farsi .step,.farsi .qlabel,.farsi .scale button,.farsi .big{font-family:Tahoma,Arial,sans-serif}\n  .farsi .ends,.farsi .row,.farsi .small-links,.farsi .bar-in{direction:rtl}\n</style>
 </head>
 <body>
 <div class="wrap">
-  <p class="brand"><svg id="logo" viewBox="0 0 64 64" aria-hidden="true"></svg>kinks.mlm <button class="linkbtn" id="langToggle" type="button">فارسی</button></p>
+  <p class="brand"><svg id="logo" viewBox="0 0 64 64" aria-hidden="true"></svg>kinks.mlm</p>
   <section class="view" id="view" hidden>
     <header>
       <h1><b id="viewWho"></b> <span>jars</span></h1>
@@ -139,6 +139,12 @@
     <main>
       <section class="panel">
         <div class="step">Step 1</div>
+        <h2>What is your name?</h2>
+        <p class="hint">It goes on the blank line at the top. Nickname is fine, or leave it blank.</p>
+        <input type="text" id="personName" maxlength="60" placeholder="Your name" aria-label="Your name">
+      </section>
+      <section class="panel">
+        <div class="step">Step 2</div>
         <h2>Pick your color</h2>
         <div class="picker">
           <div>
@@ -160,7 +166,7 @@
       </section>
 
       <section class="panel">
-        <div class="step">Step 2</div>
+        <div class="step">Step 3</div>
         <h2>Fill your jars</h2>
         <p class="hint">Tap a number, tag a jar as curious, or tape it shut as a hard limit. Tap again to undo.</p>
         <div id="questions"></div>
@@ -169,7 +175,7 @@
 
     <aside class="side">
       <section class="panel" id="done">
-        <div class="step">Step 3</div>
+        <div class="step">Step 4</div>
         <h2>Your jars</h2>
         <canvas class="poster" id="poster" aria-label="Preview of your filled jars"></canvas>
         <button class="big" id="share" type="button">Share my link</button>
@@ -206,7 +212,8 @@
 /* ===== jars ===== */
 
 /* ===== Farsi language support ===== */
-let LANG = (() => { try { return localStorage.getItem("kinkjars-language") === "fa" ? "fa" : "en"; } catch(e) { return "en"; } })();
+let LANG = "en";
+let personName = ""; try { personName = localStorage.getItem("kinkjars-name") || ""; } catch(e) {}
 const JARS_FA = [
 ["سلطه‌گر بودن"],["تسلیم بودن"],["سوئیچ بودن"],["داینامیک ددی /","پسر"],["بازی توله و","حیوان خانگی"],["خدمت و واکس‌زدن","چکمه"],["عدم رضایت توافقی","(CNC)"],
 ["تعریف کردن"],["تعریف شنیدن"],["تحقیر کردن"],["تحقیر شدن"],["کنترل ارگاسم"],["کنترل ارگاسم و","عفت (چَستیتی)"],["هیپنوتیزم شهوانی"],
@@ -242,80 +249,226 @@ const UI_FA = {
   typo:"احتمالاً کد اشتباه تایپی دارد. دوباره بررسی کنید.", invalid:"این پیوند یا کد این صفحه به نظر نمی‌رسد.", same:"این کد متعلق به خودتان است.",
   resetConfirm:"همهٔ شیشه‌ها خالی شوند و از نو شروع کنید؟", adoptConfirm:"شیشه‌های فعلی‌تان با این شیشه‌ها جایگزین شوند؟"
 };
-function applyLanguage(){
- const fa=LANG==="fa"; document.documentElement.lang=fa?"fa":"en";document.document.documentElement.dir=fa?"rtl":"ltr";document.body.dir=fa?"rtl":"ltr";document.body.classList.toggle("farsi",fa);
- $("langToggle").textContent=fa?"English":"فارسی";
- const h=$("top").querySelector("h1");h.firstChild.textContent=fa?UI_FA.welcome:"Welcome to the ";h.querySelector("span").textContent=fa?UI_FA.pantry:"pantry";
- $("top").querySelector("p").textContent=fa?UI_FA.intro:"Pick a color, rate each jar from 1 (a little) to 5 (overflowing), then share your link. Not your thing? Skip it and the jar stays empty.";
- [...document.querySelectorAll(".step")].forEach((e,i)=>e.textContent=fa?UI_FA.steps[i]:["Step 1","Step 2","Step 3","Extra"][i]);
- [...document.querySelectorAll(".panel h2")].forEach((e,i)=>e.textContent=fa?UI_FA.headings[i]:["Pick your color","Fill your jars","Your jars","Compare with someone"][i]);
- const hints=[...document.querySelectorAll(".hint")];if(hints[0])hints[0].textContent=fa?UI_FA.fillHint:"Tap a number, tag a jar as curious, or tape it shut as a hard limit. Tap again to undo.";
- if(hints[1])hints[1].textContent=fa?UI_FA.compareHint:"Paste a link they shared from this page, or type in their code. You get one picture with every jar split in two, yours on the left and theirs on the right, and a link to it that you can share.";
- document.querySelectorAll(".sl").forEach((e,i)=>e.firstChild.nodeValue=fa?UI_FA.colors[i]:["Red","Green","Blue"][i]);
- $("surprise").textContent=fa?UI_FA.surprise:"Surprise me";$("share").textContent=$("shareBar").textContent=fa?UI_FA.share:"Share my link";
- $("viewCompare").textContent=fa?UI_FA.compareMine:"Compare with mine";$("viewShare").textContent=fa?UI_FA.shareComparison:"Share this comparison";
- $("viewAsk").textContent=fa?UI_FA.ownQuestion:"Want to create your own?";$("viewOwn").textContent=fa?UI_FA.click:"Click here";
- $("viewAdopt").firstChild.textContent=fa?UI_FA.areYours+" ":"Are these yours? ";$("adopt").textContent=fa?UI_FA.useOwn:"Use them as my own jars";
- $("copyCode").textContent=fa?UI_FA.copy:"Copy code";$("reset").textContent=fa?UI_FA.reset:"Start over";
- $("olink").placeholder=fa?UI_FA.placeholder:"Their link or code";$("cmpForm").querySelector("button").textContent=fa?UI_FA.compare:"Compare";
- document.querySelector(".code > span").textContent=fa?UI_FA.code:"Or give them your code";
- document.querySelector(".small-links > span").textContent=fa?UI_FA.nothing:"Nothing leaves your phone until you share your link or code.";
- document.querySelectorAll(".ends span").forEach((e,i)=>e.textContent=fa?UI_FA.ends[i]:["a little","overflowing"][i]);
- minis.forEach((m,i)=>{const q=m.canvas.closest(".q"),name=(fa?JARS_FA[i]:JARS[i]).join(" ");q.querySelector(".qlabel").textContent=name;
- q.querySelector(".qnum").firstChild.nodeValue=fa?(i+1)+" از "+JARS.length:(i+1)+" of "+JARS.length;
- const p=q.querySelector(".about"),key=JARS[i].join(" ").toLowerCase();if(p&&ABOUT[key])p.textContent=fa?ABOUT_FA[i]:ABOUT[key];
- const b=q.querySelector(".qnum .linkbtn");if(b)b.textContent=fa?UI_FA.about:"What's this?";
- q.querySelector(".scale").setAttribute("aria-label",name);
- m.buttons.forEach((b,k)=>{const en=["1 out of 5","2 out of 5","3 out of 5","4 out of 5","5 out of 5","curious","hard limit"],f=["۱ از ۵","۲ از ۵","۳ از ۵","۴ از ۵","۵ از ۵","کنجکاو","مرز قطعی"];b.setAttribute("aria-label",name+": "+(fa?f[k]:en[k]));});
- });
- $("progress").textContent=fa?state.answers.filter(Boolean).length+" از "+JARS.length+" پاسخ داده شده":state.answers.filter(Boolean).length+" of "+JARS.length+" answered";
-}
-
-const JARS = [
-  ["Being a", "Dom"], ["Being a", "Sub"], ["Being a", "Switch"], ["Daddy /", "Boy Dynamics"], ["Puppy Play", "& Pet Play"], ["Service Submission", "& Bootblacking"], ["Consensual Non-", "Consent (CNC)"],
-  ["Giving", "Praise"], ["Receiving", "Praise"], ["Humiliating", "or Degrading"], ["Being Humiliated", "or Degraded"], ["Controlling", "Orgasms"], ["Having Orgasms", "Controlled & Chastity"], ["Erotic", "Hypnosis"],
-  ["Tying People Up"], ["Being Tied Up"], ["Sensory Deprivation", "& Gags"], ["Spanking &", "Flogging (Giving)"], ["Being Spanked", "& Flogged (Receiving)"], ["Choking &", "Being Choked"], ["Nipple/Genital", "Play (CBT), Wax", "& Electro-Stim"],
-  ["Leather, Rubber", "& Latex"], ["Jockstraps,", "Underwear & Sportswear"], ["Uniforms & Cigar", "/ Smoke Play"], ["Foot, Sock &", "Footwear Worship"], ["Musky Scents", "(Olfactophilia)"], ["Body Hair", "& Bears"], ["Muscle, Belly", "& Size Worship"],
-  ["Anal Play"], ["Sounding", "& Fisting"], ["Threesomes", "& Group Play"], ["Doing Stuff in", "Public (Exhibitionism", "& Voyeurism)"], ["Anonymous Play", "& Gloryholes"], ["Spit Play"], ["Watersports"]
+const JAR_LABELS_EN = [
+  "Being a Dom",
+  "Being a Sub",
+  "Being a Switch",
+  "Daddy / Boy",
+  "Puppy & Slave Play",
+  "CNC Play",
+  "Praise Play",
+  "Degradation & Humiliation",
+  "Chastity & Edging",
+  "Bondage & Shibari",
+  "Hoods & Gags",
+  "Spanking & Impact",
+  "S&M (Pain Play)",
+  "Wax Play",
+  "Choking & Breath Play",
+  "Leather & Latex",
+  "Jocks & Gear",
+  "Lingerie & Panties",
+  "Uniforms",
+  "Piercings & Tattoos",
+  "Hair, Bears & Otters",
+  "Body Worship",
+  "Musk & Scents",
+  "Feet & Socks",
+  "Rimming",
+  "Barebacking",
+  "Face Fucking",
+  "Cum Play",
+  "Fisting",
+  "Double Penetration (DP)",
+  "Group Play",
+  "Public Play",
+  "Anon Play & Gloryhole",
+  "Spit Play",
+  "Watersports"
 ];
-const PAIRS = [[0, 1], [7, 8], [9, 10], [11, 12], [14, 15], [17, 18]];
-const ABOUT = {
-  "being a dom": "Leading the power exchange in a Dominance & Submission (D/s) dynamic.",
-  "being a sub": "Surrendering control within a Dominance & Submission (D/s) dynamic.",
-  "being a switch": "Moving between dominant and submissive roles.",
-  "daddy / boy dynamics": "Roleplay and age play built around mentorship, caretaking, or authority.",
-  "puppy play & pet play": "Adopting a canine or pet headspace alongside handlers.",
-  "service submission & bootblacking": "Expressing devotion through structured tasks or leather boot care.",
-  "consensual non-consent (cnc)": "Pre-negotiated captive, interrogation, or forced-submission roleplay.",
-  "giving praise": "Using affirming verbal play to validate a partner.",
-  "receiving praise": "Being affirmed and rewarded through verbal play.",
-  "humiliating or degrading": "Dishonoring or belittling a partner through verbal play.",
-  "being humiliated or degraded": "Receiving rough verbal degradation.",
-  "controlling orgasms": "Directing when and how a partner is allowed to climax.",
-  "having orgasms controlled & chastity": "Surrendering climax control or wearing a chastity device.",
-  "erotic hypnosis": "Guided trance and psychological control play.",
-  "tying people up": "Applying rope bondage (Shibari) or restraints to immobilize a partner.",
-  "being tied up": "Being immobilized with rope bondage, cuffs, or restraints.",
-  "sensory deprivation & gags": "Using gags, blindfolds, or hoods to restrict speech and sight.",
-  "spanking & flogging (giving)": "Delivering impact play or sadism.",
-  "being spanked & flogged (receiving)": "Receiving impact play or masochism.",
-  "choking & being choked": "Engaging in consensual breath control.",
-  "nipple/genital play (cbt), wax & electro-stim": "High-intensity sensation play using clamps, wax play, or electro-stimulation.",
-  "leather, rubber & latex": "Harnesses, chaps, and sleek rubber or latex gear.",
-  "jockstraps, underwear & sportswear": "Athletic supporters, sports gear, neoprene, and spandex.",
-  "uniforms & cigar / smoke play": "Authority gear paired with masculine cigar and smoke rituals.",
-  "foot, sock & footwear worship": "Focus on bare feet, athletic socks, and boots.",
-  "musky scents (olfactophilia)": "Attraction to natural male body odor.",
-  "body hair & bears": "Focus on beards, chest hair, and bear subculture builds.",
-  "muscle, belly & size worship": "Physical devotion to muscular physiques, bellies, or gaining.",
-  "anal play": "Receptive and penetrative anal play.",
-  "sounding & fisting": "Advanced urethral play or deep manual stretching.",
-  "threesomes & group play": "Multi-partner sexual encounters.",
-  "doing stuff in public (exhibitionism & voyeurism)": "Semi-public play, watching others, or being watched.",
-  "anonymous play & gloryholes": "Identity-concealed encounters focused on raw physical sensation.",
-  "spit play": "Incorporating saliva into intimacy or power exchange.",
-  "watersports": "Erotic play involving urine."
-};
+const ABOUT_EN = [
+  "Taking charge and telling your partner what to do in bed.",
+  "Letting your partner take charge and following their orders.",
+  "Enjoying both taking charge and letting your partner take charge.",
+  "Roleplaying an older, caring, or firm 'Daddy' with a younger-acting 'Boy.'",
+  "Acting playful like a dog in a pup hood (puppy play) or serving your partner as a devoted slave (service play, like shining boots).",
+  "Pretending to be forced, interrogated, or captured during sex, after agreeing on rules and safe words first.",
+  "Getting turned on by praising your partner ('good boy') or being praised and complimented.",
+  "Using or receiving rough talk, name-calling, and teasing to create a sense of submission.",
+  "Controlling when a partner can cum, being edged repeatedly, or wearing a chastity cage.",
+  "Tying up a partner or being tied up using artistic rope knots (Shibari), cuffs, or tape.",
+  "Using blindfolds, hoods, or mouth gags so you or your partner cannot see or speak.",
+  "Slapping, paddling, or whipping a partner's butt or body—or being spanked—for pleasure.",
+  "Getting pleasure from giving pain (sadism) or receiving intense pain (masochism), including nipple clamps and ball torture (CBT).",
+  "Dripping warm, melted candle wax onto a partner's skin—or having it dripped on you—for intense heat sensation.",
+  "Safely squeezing a partner's neck or having your neck squeezed (or wearing a gas mask) during sex.",
+  "Wearing or seeing a partner in leather harnesses, chaps, boots, or tight rubber gear.",
+  "Getting turned on by jockstraps, men's underwear, singlets, or sporty locker-room clothes.",
+  "Wearing or getting turned on by women's panties, lace underwear, stockings, or feminine lingerie.",
+  "Getting turned on by police, military, or firefighter gear, medical scrubs, or skater/punk styles.",
+  "Attraction to body ink, tattooed skin, and piercings on the face, nipples, or genitals.",
+  "Attraction to full beards, hairy chests, stocky 'bears' or lean hairy 'otters",
+  "Kissing, rubbing, and admiring a partner's big muscles, soft belly, or body build.",
+  "Smelling natural male sweat and body odor from armpits, groins, skin, or worn gym clothes.",
+  "Kissing, rubbing, smelling, or showing off bare feet, gym socks, or boots.",
+  "Licking, kissing, and eating out your partner's butt, or being rimmed.",
+  "Having raw, condomless anal sex or 'breeding' (cumming inside your partner).",
+  "Rough, deep oral sex where the top takes control of the partner's mouth and throat.",
+  "Playing with semen—like facials, swallowing, or rubbing cum on the body.",
+  "Gradually stretching and sliding a well-lubed hand into a partner's butt, or being fisted.",
+  "Being penetrated by two penises—or a penis and a toy—at the same time, or doing it to a partner.",
+  "Having sex with two or more people at the same time, like threesomes or group sex.",
+  "Fooling around where someone might see you, watching others have sex, or being watched.",
+  "Hooking up with strangers without knowing their names—like at bathhouses, darkrooms, or gloryholes.",
+  "Spitting on your partner, into their mouth, or using spit as lube during sex.",
+  "Peeing on a partner, being peed on, or watching someone pee during sex."
+];
+const JARS_FA = [
+  [
+    "دام بودن"
+  ],
+  [
+    "ساب بودن"
+  ],
+  [
+    "سوییچ بودن"
+  ],
+  [
+    "ددی و بوی"
+  ],
+  [
+    "برده و پاپی پلی"
+  ],
+  [
+    "اجبار توافقی"
+  ],
+  [
+    "تحسین و تمجید"
+  ],
+  [
+    "تحقیر کلامی"
+  ],
+  [
+    "قفس عفت و اجینگ"
+  ],
+  [
+    "بانداج و شیباری"
+  ],
+  [
+    "چشم‌بند و دهان‌بند"
+  ],
+  [
+    "اسپنک و ضربه"
+  ],
+  [
+    "سادیسم و مازوخیسم (S&M)"
+  ],
+  [
+    "بازی با شمع"
+  ],
+  [
+    "چوک و کنترل نفس"
+  ],
+  [
+    "چرم و لاتکس"
+  ],
+  [
+    "شورت و لباس ورزشی"
+  ],
+  [
+    "لباس زیر زنانه و لانژری"
+  ],
+  [
+    "یونیفرم و استایل"
+  ],
+  [
+    "پیرسینگ و تتو"
+  ],
+  [
+    "موی بدن (خرس، آتر)"
+  ],
+  [
+    "پرستش عضله و اندام"
+  ],
+  [
+    "بوی بدن و عرق"
+  ],
+  [
+    "پا و جوراب"
+  ],
+  [
+    "ریمینگ / لیسیدن مقعد"
+  ],
+  [
+    "سکس بدون کاندوم"
+  ],
+  [
+    "فیس‌فاکینگ"
+  ],
+  [
+    "بازی با آب منی"
+  ],
+  [
+    "فیستینگ"
+  ],
+  [
+    "دخول دوگانه (DP)"
+  ],
+  [
+    "سکس گروهی و تری‌سام"
+  ],
+  [
+    "سکس در محیط عمومی"
+  ],
+  [
+    "سکس ناشناس"
+  ],
+  [
+    "بازی با آب دهان"
+  ],
+  [
+    "واتراسپورت / ادرار"
+  ]
+];
+const ABOUT_FA = [
+  "کنترل رابطه را به دست گرفتن و به پارتنر گفتن که در رختخواب چه کار کند.",
+  "سپردن کنترل به پارتنر و گوش دادن به دستورات او در رابطه.",
+  "لذت بردن از هر دو نقش دام (کنترل‌گر) و ساب (فرمان‌بردار).",
+  "نقش‌بازی در قالب یک «ددی» بزرگ‌تر، حامی یا جدی در کنار یک «بوی» جوان‌تر و مطیع.",
+  "رفتار کردن مثل یک پاپی با نقاب سگ (Puppy Play) یا خدمت کردن به پارتنر در نقش برده مطیع (مثل واکس زدن پوتین یا سرویس دادن).",
+  "وانمود کردن به سکس زوری، بازجویی یا آدم‌ربایی.",
+  "تحریک شدن از تعریف و تمجید کردن از پارتنر یا شنیدن تعریف از او.",
+  "استفاده از حرف‌های خشن و فحش‌های سکسی برای پارتنر، یا لذت بردن از اینکه با شما خشن و تحقیرآمیز حرف بزنند.",
+  "رساندن یا رسیدن به مرز ارضا شدن بدون تخلیه (Edging)، کنترل زمان ارضا شدن، یا بستن قفس عفت (Chastity Cage).",
+  "بستن یا بسته شدن دست‌وپا با گره‌های طناب (شیباری / Shibari)، دستبند یا چسب طوری که نتوان تکان خورد.",
+  "استفاده از چشم‌بند، نقاب (هود) یا دهان‌بند (Gag) برای گرفتن حس بینایی یا توان حرف زدن.",
+  "زدن یا خوردن سیلی، پدل و شلاق روی باسن یا بدن برای هیجان و لذت جنسی.",
+  "لذت بردن از وارد کردن درد (سادیسم) یا کشیدن درد (مازوخیسم)، شامل گیره زدن و فشار دادن نوک سینه و بیضه‌ها (CBT).",
+  "چکاندن اشک شمع گرم روی پوست پارتنر یا روی بدن خودتان برای تجربه حس داغی و تحریک پوستی.",
+  "فشار دادن ایمن گلوی پارتنر یا گرفته شدن گلو توسط پارتنر حین سکس.",
+  "پوشیدن یا دیدن پارتنر با هارنس چرمی، پوتین، یا لباس‌های تنگ پلاستیکی و لاتکس.",
+  "تحریک شدن با شورت‌های جاک‌استرپ (Jockstrap)، لباس زیر مردانه، دوبنده کشتی یا لباس‌های ورزشی.",
+  "پوشیدن یا تحریک شدن با شورت زنانه، لباس زیر توری و فانتزی (لانژری / Lingerie) یا جوراب شلواری.",
+  "تحریک شدن با لباس پلیس، نظامی، آتش‌نشان، لباس اتاق عمل (اسکراب پزشکی) یا استایل اسکیت‌بورد و پانک.",
+  "علاقه و تحریک شدن با تتوهای بدن و پیرسینگ روی صورت، نوک سینه (نیپل) یا آلت تناسلی.",
+  "علاقه به ریش پرپشت، بدن پشمالو، تیپ‌های درشت (خرس / Bear) یا لاغر و پرمو (سمور / Otter)",
+  "بوسیدن، لمس کردن و تحسین کردن عضلات درشت، شکم یا فرم اندام پارتنر.",
+  "لذت بردن از بوی طبیعی عرق و بدن مردانه، به‌خصوص زیربغل، کشاله ران یا لباس باشگاه.",
+  "بوسیدن، ماساژ دادن، بو کردن یا نمایش پای برهنه، جوراب ورزشی یا پوتین (فیتیش پا).",
+  "لیسیدن و بوسیدن مقعد پارتنر یا لذت بردن از اینکه مقعد شما را بلیسند.",
+  "سکس مقعدی بدون کاندوم (Raw) و لذت بردن از خالی کردن آب منی داخل بدن پارتنر (Breeding).",
+  "سکس دهانی عمیق و خشن (دیپ‌تروت) که در آن نفر فاعل کنترل کامل دهان و گلوی پارتنر را به دست می‌گیرد.",
+  "لذت بردن از بازی با آب منی؛ مثل پاشیدن روی صورت و بدن، قورت دادن، یا نگه داشتن آن داخل بدن.",
+  "باز کردن تدریجی مقعد و وارد کردن دست آغشته به لوبریکانت به مقعد پارتنر (یا تجربه کردن آن).",
+  "دخول هم‌زمان دو آلت تناسلی (یا یک آلت و یک دیلدو) به مقعد، یا انجام آن برای پارتنر.",
+  "سکس هم‌زمان با دو یا چند نفر، مثل تری‌سام یا اورجی.",
+  "شیطنت و سکس در جاهایی که ممکن است دیده شوید، تماشای سکس دیگران، یا دیده شدن حین سکس.",
+  "رابطه با افراد غریبه بدون دانستن اسم و هویت آن‌ها، مثل سونا، دارک‌روم یا گلوری‌هول (Gloryhole).",
+  "تف انداختن روی بدن یا داخل دهان پارتنر، یا استفاده از آب دهان به عنوان روانکاری حین سکس.",
+  "ادرار کردن روی پارتنر، ادرار شدن روی شما، یا تماشای ادرار کردن طرف مقابل در رابطه."
+];
+const JARS = JAR_LABELS_EN.map(label => label.split(/\s+/));
+const PAIRS = [[0,1],[6,6],[7,7],[8,8],[9,9],[11,11]];
 const PRESETS = ["#e63946","#ff5d8f","#ff8c42","#ffd23f","#7bd389","#2ec4b6","#3a86ff","#5b2a86","#c77dff","#8d1d3a","#8d5524","#2b2d42"];
 const COLS = 7, INK = "#151311", PW = 1200;
 const ROWS = Math.ceil(JARS.length / COLS);
@@ -566,7 +719,7 @@ function drawPoster(canvas, me = state, them = null, plain = false) {
   c.textBaseline = "alphabetic";
   if (!plain) {
     c.fillStyle = INK; c.textAlign = "center"; c.font = "700 104px Oswald, Impact, 'Arial Narrow', sans-serif";
-    c.fillText(LANG === "fa" ? "شیشه‌های کینک شما" : "Your kink jars", PW / 2, 140);
+    c.fillText(personName ? personName + "’s Kink Jars" : "Your Kink Jars", PW / 2, 140);
   }
   c.textAlign = "center"; c.font = "500 30px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
   c.fillText(LANG === "fa" ? "(۱ = کم · ۵ = سرریز · ؟ = کنجکاو · X = مرز قطعی)" : "(1 = a little  ·  5 = overflowing  ·  ? = curious  ·  X = hard limit)", PW / 2, 200 - lift);
@@ -585,7 +738,7 @@ function drawPoster(canvas, me = state, them = null, plain = false) {
 
   for (let row = 0; row < ROWS; row++) shelf(c, 50, PW - 50, top0 + row * pitch + 170);
   JARS.forEach((originalLabel, i) => {
-    const label = LANG === "fa" ? JARS_FA[i] : originalLabel;
+    const label = originalLabel;
     const cx = PW / 2 + (i % COLS - (COLS - 1) / 2) * 150, top = top0 + Math.floor(i / COLS) * pitch;
     c.save(); c.translate(cx - 48, top);
     if (them) {
@@ -719,9 +872,11 @@ const qWrap = $("questions"), minis = [];
 JARS.forEach((label, i) => {
   const text = label.join(" ");
   const q = document.createElement("div"); q.className = "q";
-  q.innerHTML = `<canvas aria-hidden="true"></canvas><div><div class="qnum">${i + 1} of ${JARS.length}</div><div class="qlabel"></div><p class="about" hidden></p><div class="scale" role="group"></div><div class="ends"><span>a little</span><span>overflowing</span></div><div class="scale marks"></div></div>`;
-  q.querySelector(".qlabel").textContent = text;
-  if (ABOUT[text.toLowerCase()]) {
+  q.innerHTML = `<canvas aria-hidden="true"></canvas><div><div class="qnum">${i + 1} of ${JARS.length}</div><div class="qlabel"></div><p class="about"></p><p class="about about-fa" dir="rtl"></p><div class="scale" role="group"></div><div class="ends"><span>a little</span><span>overflowing</span></div><div class="scale marks"></div></div>`;
+  q.querySelector(".qlabel").textContent = JAR_LABELS_EN[i];
+  q.querySelector(".about").textContent = ABOUT_EN[i];
+  q.querySelector(".about-fa").textContent = JARS_FA[i][0] + " — " + ABOUT_FA[i];
+  if (false && ABOUT[text.toLowerCase()]) {
     const p = q.querySelector(".about"), b = document.createElement("button"); b.type = "button"; b.className = "linkbtn"; b.textContent = "What's this?";
     p.textContent = ABOUT[text.toLowerCase()]; p.id = "about" + i; b.setAttribute("aria-controls", p.id); b.setAttribute("aria-expanded", false);
     b.onclick = () => { p.hidden = !p.hidden; b.setAttribute("aria-expanded", !p.hidden); };
@@ -831,8 +986,8 @@ $("adopt").onclick = () => {
 };
 
 fromHash();
-$("langToggle").onclick = () => { LANG = LANG === "en" ? "fa" : "en"; try { localStorage.setItem("kinkjars-language", LANG); } catch(e) {} applyLanguage(); render(); };
-applyLanguage();
+$("personName").value = personName;
+$("personName").addEventListener("input", e => { personName = e.target.value; try { localStorage.setItem("kinkjars-name", personName); } catch(err) {} update(); });
 render();
 Promise.all(["700 104px Oswald, Impact, 'Arial Narrow', sans-serif", "600 30px Oswald", "500 30px Oswald, 'Arial Narrow', sans-serif"].map(f => document.fonts.load(f)))
   .catch(() => {}).then(() => document.fonts.ready).then(render);
