@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>kinks.casa</title>
+<title>kinks.mlm</title>
 <meta name="description" content="Fill your jars, pick your color, share your link.">
-<meta property="og:title" content="kinks.casa">
+<meta property="og:title" content="kinks.mlm">
 <meta property="og:description" content="Fill your jars, pick your color, share your link.">
-<meta property="og:site_name" content="kinks.casa">
+<meta property="og:site_name" content="kinks.mlm">
 <meta name="robots" content="noindex">
 <link rel="icon" id="icon" href="data:,">
 <style>
@@ -112,12 +112,12 @@
   .bar .big{width:auto;margin:0;padding:12px 22px;font-size:21px;box-shadow:0 4px 0 var(--ink)}
   @media(min-width:960px){.bar{display:none}}
 
-  .privacy{font-size:14px;color:var(--muted);text-align:center;margin-top:8px}
+  .privacy{font-size:14px;color:var(--muted);text-align:center;margin-top:8px}\n  #langToggle{margin-left:auto;font-size:14px}\n  .farsi{font-family:Tahoma,Arial,sans-serif}\n  .farsi .brand,.farsi h1,.farsi h2,.farsi .step,.farsi .qlabel,.farsi .scale button,.farsi .big{font-family:Tahoma,Arial,sans-serif}\n  .farsi .ends,.farsi .row,.farsi .small-links,.farsi .bar-in{direction:rtl}\n  .farsi .code b{direction:ltr}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <p class="brand"><svg id="logo" viewBox="0 0 64 64" aria-hidden="true"></svg>kinks.casa</p>
+  <p class="brand"><svg id="logo" viewBox="0 0 64 64" aria-hidden="true"></svg>kinks.mlm <button class="linkbtn" id="langToggle" type="button">فارسی</button></p>
   <section class="view" id="view" hidden>
     <header>
       <h1><b id="viewWho"></b> <span>jars</span></h1>
@@ -204,6 +204,73 @@
 
 <script>
 /* ===== jars ===== */
+
+/* ===== Farsi language support ===== */
+let LANG = (() => { try { return localStorage.getItem("kinkjars-language") === "fa" ? "fa" : "en"; } catch(e) { return "en"; } })();
+const JARS_FA = [
+["سلطه‌گر بودن"],["تسلیم بودن"],["سوئیچ بودن"],["داینامیک ددی /","پسر"],["بازی توله و","حیوان خانگی"],["خدمت و واکس‌زدن","چکمه"],["عدم رضایت توافقی","(CNC)"],
+["تعریف کردن"],["تعریف شنیدن"],["تحقیر کردن"],["تحقیر شدن"],["کنترل ارگاسم"],["کنترل ارگاسم و","عفت (چَستیتی)"],["هیپنوتیزم شهوانی"],
+["بستن دیگران"],["بسته شدن"],["محرومیت حسی و","دهان‌بند"],["شلاق زدن","(دادن)"],["شلاق خوردن","(دریافت)"],["خفه‌کردن و","خفه‌شدن"],["بازی با نوک پستان،","اندام تناسلی، موم و برق"],
+["چرم، لاستیک و","لاتکس"],["لباس زیر و","لباس ورزشی"],["یونیفرم و سیگار","یا بازی با دود"],["پرستش پا، جوراب","و کفش"],["رایحه طبیعی بدن","(بویایی‌گرایی)"],["موی بدن و","خرس‌ها"],["پرستش عضله، شکم","و جثه"],
+["بازی مقعدی"],["سوندگذاری و","فیستینگ"],["رابطه سه‌نفره و","گروهی"],["بازی در فضای عمومی","(نمایشگری و تماشاگری)"],["رابطه ناشناس و","گلوری‌هول"],["بازی با بزاق"],["یورینوفیلی"]
+];
+const ABOUT_FA = [
+"رهبری پویایی قدرت در رابطهٔ سلطه و تسلیم (D/s).","واگذار کردن کنترل در رابطهٔ سلطه و تسلیم (D/s).","جابه‌جایی میان نقش مسلط و مطیع.",
+"نقش‌آفرینی با محوریت مراقبت، راهنمایی یا اقتدار.","ورود به ذهنیت توله یا حیوان خانگی در کنار هندلر.","ابراز فداکاری از راه خدمت یا مراقبت از چکمه‌های چرمی.",
+"نقش‌آفرینیِ اسارت یا اجبار که از پیش با رضایت و توافق مشخص شده است.","استفاده از کلمات تأییدکننده برای دلگرم کردن شریک.","دریافت تأیید و تشویق کلامی.",
+"تحقیر کردن یا کوچک شمردن شریک از راه کلام.","دریافت تحقیر کلامی.","تعیین زمان و شیوهٔ رسیدن شریک به ارگاسم.",
+"واگذاری کنترل ارگاسم یا استفاده از وسیلهٔ عفت.","خلسهٔ هدایت‌شده و بازی با کنترل روانی.","بی‌حرکت کردن شریک با طناب یا پابند و دست‌بند.",
+"بی‌حرکت شدن با طناب، پابند یا دست‌بند.","محدود کردن دید یا گفتار با چشم‌بند یا دهان‌بند.","انجام بازی ضربه‌ای یا نقش سادیستی.",
+"دریافت بازی ضربه‌ای یا نقش مازوخیستی.","بازی توافقی با کنترل تنفس؛ این فعالیت خطر جسمی جدی دارد.","بازی حسی شدید با گیره، موم یا تحریک الکتریکی.",
+"استفاده از پوشاک و تجهیزات چرمی، لاستیکی یا لاتکس.","لباس زیر ورزشی و تجهیزات ورزشی.","پوشیدن یونیفرم همراه با آیین‌های سیگار یا دود.",
+"توجه شهوانی به پا، جوراب و چکمه.","جذب شدن به بوی طبیعی بدن.","توجه به ریش، موی سینه و خرده‌فرهنگ خرس‌ها.",
+"تمرکز بر عضلات، شکم یا جثهٔ بدن.","بازی‌های مقعدیِ پذیرنده یا دخولی.","بازی با مجرای ادرار یا کشش دستی عمیق.",
+"تجربه‌های جنسی با چند شریک.","بازی نیمه‌عمومی، تماشا کردن دیگران یا دیده شدن.","برخوردهایی با پنهان ماندن هویت که بر حس جسمی تمرکز دارند.",
+"وارد کردن بزاق به صمیمیت یا پویایی قدرت.","بازی شهوانی مرتبط با ادرار."
+];
+const UI_FA = {
+  welcome:"به انبار خوش آمدید", pantry:"انبار", intro:"یک رنگ انتخاب کنید، هر شیشه را از ۱ (کم) تا ۵ (سرریز) امتیاز دهید و سپس پیوندتان را به اشتراک بگذارید. اگر موردی باب میلتان نیست، از آن بگذرید تا شیشه خالی بماند.",
+  steps:["مرحلهٔ ۱","مرحلهٔ ۲","مرحلهٔ ۳","اضافی"], headings:["رنگتان را انتخاب کنید","شیشه‌هایتان را پر کنید","شیشه‌های شما","مقایسه با یک نفر"],
+  fillHint:"روی یک عدد بزنید، شیشه‌ای را «کنجکاو» علامت بزنید یا آن را به‌عنوان مرز قطعی ببندید. برای لغو، دوباره بزنید.",
+  compareHint:"پیوندی را که برایتان فرستاده‌اند جای‌گذاری کنید یا کدشان را وارد کنید. تصویر، شیشه‌های هر دو نفر را کنار هم نشان می‌دهد و می‌توانید پیوند مقایسه را به اشتراک بگذارید.",
+  colors:["قرمز","سبز","آبی"], surprise:"غافلگیرم کن", share:"اشتراک‌گذاری پیوند من", compare:"مقایسه", compareMine:"مقایسه با من",
+  shareComparison:"اشتراک‌گذاری این مقایسه", ownQuestion:"می‌خواهید شیشه‌های خودتان را بسازید؟", click:"اینجا را بزنید",
+  areYours:"این‌ها شیشه‌های شما هستند؟", useOwn:"این‌ها را شیشه‌های خودم قرار بده", code:"یا کدتان را بدهید", copy:"کپی کد",
+  nothing:"تا وقتی پیوند یا کد را به اشتراک نگذارید، چیزی از دستگاهتان خارج نمی‌شود.", reset:"از نو شروع کن",
+  placeholder:"پیوند یا کد طرف مقابل", ends:["کم","سرریز"], about:"این چیست؟",
+  copied:"پیوند کپی شد. آن را برای فرد موردنظرتان بفرستید.", codeCopied:"کد کپی شد. می‌توانند آن را در بخش مقایسه وارد کنند.",
+  typo:"احتمالاً کد اشتباه تایپی دارد. دوباره بررسی کنید.", invalid:"این پیوند یا کد این صفحه به نظر نمی‌رسد.", same:"این کد متعلق به خودتان است.",
+  resetConfirm:"همهٔ شیشه‌ها خالی شوند و از نو شروع کنید؟", adoptConfirm:"شیشه‌های فعلی‌تان با این شیشه‌ها جایگزین شوند؟"
+};
+function applyLanguage(){
+ const fa=LANG==="fa"; document.documentElement.lang=fa?"fa":"en";document.document.documentElement.dir=fa?"rtl":"ltr";document.body.dir=fa?"rtl":"ltr";document.body.classList.toggle("farsi",fa);
+ $("langToggle").textContent=fa?"English":"فارسی";
+ const h=$("top").querySelector("h1");h.firstChild.textContent=fa?UI_FA.welcome:"Welcome to the ";h.querySelector("span").textContent=fa?UI_FA.pantry:"pantry";
+ $("top").querySelector("p").textContent=fa?UI_FA.intro:"Pick a color, rate each jar from 1 (a little) to 5 (overflowing), then share your link. Not your thing? Skip it and the jar stays empty.";
+ [...document.querySelectorAll(".step")].forEach((e,i)=>e.textContent=fa?UI_FA.steps[i]:["Step 1","Step 2","Step 3","Extra"][i]);
+ [...document.querySelectorAll(".panel h2")].forEach((e,i)=>e.textContent=fa?UI_FA.headings[i]:["Pick your color","Fill your jars","Your jars","Compare with someone"][i]);
+ const hints=[...document.querySelectorAll(".hint")];if(hints[0])hints[0].textContent=fa?UI_FA.fillHint:"Tap a number, tag a jar as curious, or tape it shut as a hard limit. Tap again to undo.";
+ if(hints[1])hints[1].textContent=fa?UI_FA.compareHint:"Paste a link they shared from this page, or type in their code. You get one picture with every jar split in two, yours on the left and theirs on the right, and a link to it that you can share.";
+ document.querySelectorAll(".sl").forEach((e,i)=>e.firstChild.nodeValue=fa?UI_FA.colors[i]:["Red","Green","Blue"][i]);
+ $("surprise").textContent=fa?UI_FA.surprise:"Surprise me";$("share").textContent=$("shareBar").textContent=fa?UI_FA.share:"Share my link";
+ $("viewCompare").textContent=fa?UI_FA.compareMine:"Compare with mine";$("viewShare").textContent=fa?UI_FA.shareComparison:"Share this comparison";
+ $("viewAsk").textContent=fa?UI_FA.ownQuestion:"Want to create your own?";$("viewOwn").textContent=fa?UI_FA.click:"Click here";
+ $("viewAdopt").firstChild.textContent=fa?UI_FA.areYours+" ":"Are these yours? ";$("adopt").textContent=fa?UI_FA.useOwn:"Use them as my own jars";
+ $("copyCode").textContent=fa?UI_FA.copy:"Copy code";$("reset").textContent=fa?UI_FA.reset:"Start over";
+ $("olink").placeholder=fa?UI_FA.placeholder:"Their link or code";$("cmpForm").querySelector("button").textContent=fa?UI_FA.compare:"Compare";
+ document.querySelector(".code > span").textContent=fa?UI_FA.code:"Or give them your code";
+ document.querySelector(".small-links > span").textContent=fa?UI_FA.nothing:"Nothing leaves your phone until you share your link or code.";
+ document.querySelectorAll(".ends span").forEach((e,i)=>e.textContent=fa?UI_FA.ends[i]:["a little","overflowing"][i]);
+ minis.forEach((m,i)=>{const q=m.canvas.closest(".q"),name=(fa?JARS_FA[i]:JARS[i]).join(" ");q.querySelector(".qlabel").textContent=name;
+ q.querySelector(".qnum").firstChild.nodeValue=fa?(i+1)+" از "+JARS.length:(i+1)+" of "+JARS.length;
+ const p=q.querySelector(".about"),key=JARS[i].join(" ").toLowerCase();if(p&&ABOUT[key])p.textContent=fa?ABOUT_FA[i]:ABOUT[key];
+ const b=q.querySelector(".qnum .linkbtn");if(b)b.textContent=fa?UI_FA.about:"What's this?";
+ q.querySelector(".scale").setAttribute("aria-label",name);
+ m.buttons.forEach((b,k)=>{const en=["1 out of 5","2 out of 5","3 out of 5","4 out of 5","5 out of 5","curious","hard limit"],f=["۱ از ۵","۲ از ۵","۳ از ۵","۴ از ۵","۵ از ۵","کنجکاو","مرز قطعی"];b.setAttribute("aria-label",name+": "+(fa?f[k]:en[k]));});
+ });
+ $("progress").textContent=fa?state.answers.filter(Boolean).length+" از "+JARS.length+" پاسخ داده شده":state.answers.filter(Boolean).length+" of "+JARS.length+" answered";
+}
+
 const JARS = [
   ["Being a", "Dom"], ["Being a", "Sub"], ["Being a", "Switch"], ["Daddy /", "Boy Dynamics"], ["Puppy Play", "& Pet Play"], ["Service Submission", "& Bootblacking"], ["Consensual Non-", "Consent (CNC)"],
   ["Giving", "Praise"], ["Receiving", "Praise"], ["Humiliating", "or Degrading"], ["Being Humiliated", "or Degraded"], ["Controlling", "Orgasms"], ["Having Orgasms", "Controlled & Chastity"], ["Erotic", "Hypnosis"],
@@ -499,12 +566,12 @@ function drawPoster(canvas, me = state, them = null, plain = false) {
   c.textBaseline = "alphabetic";
   if (!plain) {
     c.fillStyle = INK; c.textAlign = "center"; c.font = "700 104px Oswald, Impact, 'Arial Narrow', sans-serif";
-    c.fillText("Your kink jars", PW / 2, 140);
+    c.fillText(LANG === "fa" ? "شیشه‌های کینک شما" : "Your kink jars", PW / 2, 140);
   }
   c.textAlign = "center"; c.font = "500 30px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
-  c.fillText("(1 = a little  ·  5 = overflowing  ·  ? = curious  ·  X = hard limit)", PW / 2, 200 - lift);
+  c.fillText(LANG === "fa" ? "(۱ = کم · ۵ = سرریز · ؟ = کنجکاو · X = مرز قطعی)" : "(1 = a little  ·  5 = overflowing  ·  ? = curious  ·  X = hard limit)", PW / 2, 200 - lift);
   if (them) {
-    const items = [[rgb, "left = You"], [orgb, "right = Them"], [0, "= you both said 4 or 5"]];
+    const items = LANG === "fa" ? [[rgb, "چپ = شما"], [orgb, "راست = طرف مقابل"], [0, "= هر دو ۴ یا ۵ گفته‌اند"]] : [[rgb, "left = You"], [orgb, "right = Them"], [0, "= you both said 4 or 5"]];
     const w = items.map(it => 34 + c.measureText(it[1]).width), total = w.reduce((s, v) => s + v + 44, -44), k = Math.min(1, (PW - 80) / total);
     c.save(); c.translate(PW / 2, 252 - lift); c.scale(k, k); c.textAlign = "left"; c.lineWidth = 3; c.lineJoin = "round"; c.strokeStyle = INK;
     let x = -total / 2;
@@ -517,7 +584,8 @@ function drawPoster(canvas, me = state, them = null, plain = false) {
   }
 
   for (let row = 0; row < ROWS; row++) shelf(c, 50, PW - 50, top0 + row * pitch + 170);
-  JARS.forEach((label, i) => {
+  JARS.forEach((originalLabel, i) => {
+    const label = LANG === "fa" ? JARS_FA[i] : originalLabel;
     const cx = PW / 2 + (i % COLS - (COLS - 1) / 2) * 150, top = top0 + Math.floor(i / COLS) * pitch;
     c.save(); c.translate(cx - 48, top);
     if (them) {
@@ -697,10 +765,10 @@ function render() {
   document.body.classList.toggle("viewing", !!shown); $("view").hidden = !shown;
   if (shown) {
     const mine = pack(shown) === pack(state), any = state.answers.some(Boolean);
-    $("viewWho").textContent = other ? "Your & their" : mine ? "Your" : "Their";
-    $("viewPic").setAttribute("aria-label", other ? "Your jars and theirs side by side" : mine ? "Your filled jars" : "Their filled jars");
+    $("viewWho").textContent = LANG === "fa" ? (other ? "شیشه‌های شما و طرف مقابل" : mine ? "شیشه‌های شما" : "شیشه‌های طرف مقابل") : other ? "Your & their" : mine ? "Your" : "Their";
+    $("viewPic").setAttribute("aria-label", LANG === "fa" ? (other ? "شیشه‌های شما و طرف مقابل کنار هم" : mine ? "شیشه‌های پرشدهٔ شما" : "شیشه‌های پرشدهٔ طرف مقابل") : other ? "Your jars and theirs side by side" : mine ? "Your filled jars" : "Their filled jars");
     $("viewCompare").hidden = !!other || mine || !any; $("viewShare").hidden = !other; $("viewAdopt").hidden = !!other || mine;
-    $("viewAsk").textContent = any ? "Back to your own jars?" : "Want to create your own?";
+    $("viewAsk").textContent = LANG === "fa" ? (any ? "بازگشت به شیشه‌های خودتان؟" : "می‌خواهید شیشه‌های خودتان را بسازید؟") : any ? "Back to your own jars?" : "Want to create your own?";
     return drawPoster(svgSurface($("viewPic")), shown, other, true);
   }
   ["r", "g", "b"].forEach((k, n) => {
@@ -763,7 +831,8 @@ $("adopt").onclick = () => {
 };
 
 fromHash();
-
+$("langToggle").onclick = () => { LANG = LANG === "en" ? "fa" : "en"; try { localStorage.setItem("kinkjars-language", LANG); } catch(e) {} applyLanguage(); render(); };
+applyLanguage();
 render();
 Promise.all(["700 104px Oswald, Impact, 'Arial Narrow', sans-serif", "600 30px Oswald", "500 30px Oswald, 'Arial Narrow', sans-serif"].map(f => document.fonts.load(f)))
   .catch(() => {}).then(() => document.fonts.ready).then(render);
