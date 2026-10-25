@@ -602,7 +602,7 @@ function drawPoster(canvas, me = state, them = null, plain = false) {
     if (them && MATE[i] !== i) {
       c.font = "500 22px Oswald, 'Arial Narrow', sans-serif"; c.fillStyle = "#555";
       let y = top + 228 + (label.length - 1) * (size + 4) + 30, line = "";
-      for (const w of ("+ " + JARS[MATE[i]].join(" ")).split(" ")) {
+      for (const w of ("+ " + (LANG === "fa" ? JARS_FA[MATE[i]] : JARS[MATE[i]]).join(" ")).split(" ")) {
         if (line && c.measureText(line + " " + w).width > 140) { c.fillText(line, cx, y); y += 26; line = w; } else line = line ? line + " " + w : w;
       }
       c.fillText(line, cx, y);
