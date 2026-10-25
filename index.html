@@ -653,9 +653,9 @@ JARS.forEach((label, i) => {
   const q = document.createElement("div"); q.className = "q";
   q.innerHTML = `<canvas aria-hidden="true"></canvas><div><div class="qnum">${i + 1} of ${JARS.length}</div><div class="qlabel"></div><p class="about" hidden></p><div class="scale" role="group"></div><div class="ends"><span>a little</span><span>overflowing</span></div><div class="scale marks"></div></div>`;
   q.querySelector(".qlabel").textContent = text;
-  if (ABOUT[text]) {
+  if (ABOUT[text.toLowerCase()]) {
     const p = q.querySelector(".about"), b = document.createElement("button"); b.type = "button"; b.className = "linkbtn"; b.textContent = "What's this?";
-    p.textContent = ABOUT[text]; p.id = "about" + i; b.setAttribute("aria-controls", p.id); b.setAttribute("aria-expanded", false);
+    p.textContent = ABOUT[text.toLowerCase()]; p.id = "about" + i; b.setAttribute("aria-controls", p.id); b.setAttribute("aria-expanded", false);
     b.onclick = () => { p.hidden = !p.hidden; b.setAttribute("aria-expanded", !p.hidden); };
     q.querySelector(".qnum").append(" · ", b);
   }
