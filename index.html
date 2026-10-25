@@ -795,17 +795,17 @@ async function share(url, note, field) {
     try { await navigator.share({ title: document.title, url }); return; }
     catch (e) { if (e.name === "AbortError") return; }
   }
-  try { await navigator.clipboard.writeText(url); note.textContent = "Link copied. Send it to whoever should see it."; }
+  try { await navigator.clipboard.writeText(url); note.textContent = LANG === "fa" ? UI_FA.copied : "Link copied. Send it to whoever should see it."; }
   catch (e) { if (field) field.focus(); note.textContent = field ? "Copy the link above and send it." : "Copy the address of this page and send it."; }
 }
 $("share").onclick = $("shareBar").onclick = () => share(myLink(), $("shareMsg"), $("mylink"));
 $("mylink").onfocus = e => e.target.select();
 $("copyCode").onclick = async () => {
-  try { await navigator.clipboard.writeText($("mycode").textContent); $("shareMsg").textContent = "Code copied. They can type it in under “Compare with someone”."; }
+  try { await navigator.clipboard.writeText($("mycode").textContent); $("shareMsg").textContent = LANG === "fa" ? UI_FA.codeCopied : "Code copied. They can type it in under “Compare with someone”."; }
   catch (e) { getSelection().selectAllChildren($("mycode")); $("shareMsg").textContent = "Copy the code above and send it."; }
 };
 $("reset").onclick = () => {
-  if (!confirm("Empty all the jars and start over?")) return;
+  if (!confirm(LANG === "fa" ? UI_FA.resetConfirm : "Empty all the jars and start over?")) return;
   state.answers = JARS.map(() => 0); say(""); persist(); update(); scrollTo({ top: 0, behavior: "smooth" });
 };
 
@@ -815,7 +815,7 @@ $("cmpForm").onsubmit = e => {
   e.preventDefault();
   const text = $("olink").value, sheet = unpack(text);
   if (!sheet) return say(text.replace(/[\s-]/g, "").length === CODE ? "That code has a typo somewhere. Check it against theirs." : "That doesn't look like a link or code from this page.");
-  if (pack(sheet) === pack(state)) return say("That one is yours.");
+  if (pack(sheet) === pack(state)) return say(LANG === "fa" ? UI_FA.same : "That one is yours.");
   $("olink").value = ""; say(""); versus(sheet);
 };
 
@@ -826,7 +826,7 @@ $("viewCompare").onclick = () => versus(shown);
 $("viewShare").onclick = () => share(location.href, $("viewMsg"));
 $("viewOwn").onclick = () => { shown = other = null; bare(); update(); scrollTo(0, 0); };
 $("adopt").onclick = () => {
-  if (state.answers.some(Boolean) && !confirm("Swap the jars you have now for these?")) return;
+  if (state.answers.some(Boolean) && !confirm(LANG === "fa" ? UI_FA.adoptConfirm : "Swap the jars you have now for these?")) return;
   state = shown; shown = null; bare(); persist(); update(); scrollTo(0, 0);
 };
 
